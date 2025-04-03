@@ -23,7 +23,7 @@
     <!-- Texto dentro del rectángulo -->
 
     <View
-        android:id="@+id/rectangulo2"
+        android:id="@+id/rep"
         android:layout_width="309dp"
         android:layout_height="42dp"
         android:background="@drawable/rounded_rectangle"
@@ -34,7 +34,7 @@
         app:layout_constraintVertical_bias="0.662" />
 
     <EditText
-        android:id="@+id/rectangulo4"
+        android:id="@+id/chatbox"
         android:layout_width="match_parent"
         android:layout_height="71dp"
         android:background="@drawable/rounded_rectangle"
@@ -52,7 +52,7 @@
         app:layout_constraintVertical_bias="0.857" />
 
     <View
-        android:id="@+id/rectangulo_2"
+        android:id="@+id/rectangulo2"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="#FFF78E"
@@ -75,7 +75,7 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/tvMelodia"
+        android:id="@+id/Melodia"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:shadowColor="#1976D2"
@@ -93,8 +93,8 @@
         app:layout_constraintTop_toTopOf="@+id/rectangulo" />
 
     <TextView
-        android:id="@+id/tvSobreLaApp"
-        android:layout_width="142dp"
+        android:id="@+id/about"
+        android:layout_width="150dp"
         android:layout_height="42dp"
         android:background="@drawable/rounded_rectangle"
         android:gravity="center"
@@ -107,10 +107,12 @@
         app:layout_constraintHorizontal_bias="0.126"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.96" />
+        app:layout_constraintVertical_bias="0.96"
+        android:clickable="true"
+        android:focusable="true"/>
 
     <TextView
-        android:id="@+id/tvSobreLaApp2"
+        android:id="@+id/random"
         android:layout_width="142dp"
         android:layout_height="42dp"
         android:background="@drawable/rounded_rectangle"
