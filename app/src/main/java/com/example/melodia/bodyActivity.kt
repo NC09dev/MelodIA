@@ -44,46 +44,37 @@ class bodyActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Menú desplegable personalizado
         val menuIcon = findViewById<ImageView>(R.id.settings)
         menuIcon.setOnClickListener {
-            val inflater = layoutInflater
-            val popupView = inflater.inflate(R.layout.popup_menu, null)
+            val popupView = layoutInflater.inflate(R.layout.popup_menu, null)
+            val popupWindow = PopupWindow(popupView, 400, 400, true)
 
-            val popupWindow = PopupWindow(
-                popupView,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                true
-            )
+            val itemConfig = popupView.findViewById<TextView>(R.id.configuration_menu)
+            val itemMelodias = popupView.findViewById<TextView>(R.id.saves_menu)
+            val itemPerfil = popupView.findViewById<TextView>(R.id.profile_menu)
+
+            itemConfig.setOnClickListener {
+                val intent = Intent(this, Optionsactivity::class.java)
+                startActivity(intent)
+                popupWindow.dismiss()
+            }
+
+            itemMelodias.setOnClickListener {
+                val intent = Intent(this, Savesactivity::class.java)
+                startActivity(intent)
+                popupWindow.dismiss()
+            }
+
+            itemPerfil.setOnClickListener {
+                val intent = Intent(this, Profileactivity::class.java)
+                startActivity(intent)
+                popupWindow.dismiss()
+            }
 
             popupWindow.elevation = 10f
-            popupWindow.setBackgroundDrawable(getDrawable(R.drawable.popup_background))
-            popupWindow.isOutsideTouchable = true
-
-            // Mostrar debajo del ícono
-            popupWindow.showAsDropDown(menuIcon, 0, 10)
-
-            // Listeners de opciones del menú
-            val configuracion = popupView.findViewById<TextView>(R.id.menu_configuracion)
-            val melodias = popupView.findViewById<TextView>(R.id.menu_mis_melodias)
-            val perfil = popupView.findViewById<TextView>(R.id.menu_perfil)
-
-            configuracion.setOnClickListener {
-                // Acción para configuración
-                popupWindow.dismiss()
-            }
-
-            melodias.setOnClickListener {
-                // Acción para melodías
-                popupWindow.dismiss()
-            }
-
-            perfil.setOnClickListener {
-                // Acción para perfil
-                popupWindow.dismiss()
-            }
+            popupWindow.showAsDropDown(menuIcon, 0, 20)
         }
+
     }
 
     // Método para ocultar los botones de navegación y la barra de estado
