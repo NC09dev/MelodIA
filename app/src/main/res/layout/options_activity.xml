@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF9FAA"
+    tools:context=".MainActivity">
+
+    <!-- Botón de volver -->
+
+    <!-- Título -->
+
+    <!-- Botón IDIOMA -->
+
+    <!-- Botón VOLUMEN -->
+
+    <!-- Imagen inferior (engranajes) -->
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/bagelfont"
+        android:shadowColor="#FFFB8E"
+        android:shadowDx="15"
+        android:shadowDy="2"
+        android:shadowRadius="3"
+        android:text="CONFIGUACIÓN"
+        android:textColor="#010542"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/volumeButton"
+        android:layout_width="match_parent"
+        android:layout_height="99dp"
+        android:layout_marginBottom="460dp"
+        android:background="#7BEEAF"
+        android:fontFamily="@font/baloo"
+        android:gravity="center"
+        android:text="VOLUMEN"
+        android:textColor="#BC724F"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/languajeButton"
+        android:layout_width="match_parent"
+        android:layout_height="99dp"
+        android:layout_marginTop="48dp"
+        android:background="#F5A826"
+        android:fontFamily="@font/baloo"
+        android:gravity="center"
+        android:text="IDIOMA"
+        android:textColor="#FFDF8E"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/volumeButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleText"
+        app:layout_constraintVertical_bias="0.27" />
+
+    <ImageView
+        android:id="@+id/settingsImage"
+        android:layout_width="403dp"
+        android:layout_height="411dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="4dp"
+        android:contentDescription="Ilustración de configuración"
+        android:scaleType="fitCenter"
+        android:src="@drawable/reparador_removebg_preview"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.4"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/volumeButton"
+        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintWidth_percent="0.6" />
+</androidx.constraintlayout.widget.ConstraintLayout>
