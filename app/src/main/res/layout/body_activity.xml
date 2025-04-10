@@ -31,7 +31,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.662" />
+        app:layout_constraintVertical_bias="0.699" />
+
+    <View
+        android:id="@+id/bar"
+        android:layout_width="240dp"
+        android:layout_height="5dp"
+        android:background="#F90370"
+        app:layout_constraintBottom_toBottomOf="@+id/rep"
+        app:layout_constraintEnd_toEndOf="@+id/rep"
+        app:layout_constraintHorizontal_bias="0.533"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rep" />
 
     <EditText
         android:id="@+id/chatbox"
@@ -72,7 +83,57 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rectangulo"
         app:layout_constraintVertical_bias="0.086"
-        tools:srcCompat="@tools:sample/avatars" />
+        />
+
+
+    <ImageView
+        android:id="@+id/settigs"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/settings"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.955"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.014"
+        />
+
+    <ImageView
+        android:id="@+id/prompt"
+        android:layout_width="33dp"
+        android:layout_height="33dp"
+        android:src="@drawable/prompt"
+        app:layout_constraintBottom_toBottomOf="@+id/chatbox"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.91"
+        app:layout_constraintStart_toStartOf="@+id/chatbox"
+        app:layout_constraintTop_toTopOf="@+id/chatbox"
+        />
+
+    <ImageView
+        android:id="@+id/heart"
+        android:layout_width="40dp"
+        android:layout_height="32dp"
+        android:src="@drawable/heart"
+        app:layout_constraintBottom_toBottomOf="@+id/rep"
+        app:layout_constraintEnd_toEndOf="@+id/rep"
+        app:layout_constraintHorizontal_bias="0.944"
+        app:layout_constraintStart_toStartOf="@+id/rep"
+        app:layout_constraintTop_toTopOf="@+id/rep"
+        />
+
+    <ImageView
+        android:id="@+id/stop"
+        android:layout_width="100dp"
+        android:layout_height= "100dp"
+        android:src="@drawable/stop"
+        app:layout_constraintBottom_toTopOf="@+id/rep"
+        app:layout_constraintEnd_toEndOf="@+id/settigs"
+        app:layout_constraintHorizontal_bias="0.524"
+        app:layout_constraintStart_toStartOf="@+id/rectangulo"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintVertical_bias="0.492" />
 
     <TextView
         android:id="@+id/Melodia"
@@ -93,39 +154,39 @@
         app:layout_constraintTop_toTopOf="@+id/rectangulo" />
 
     <TextView
-        android:id="@+id/about"
-        android:layout_width="150dp"
-        android:layout_height="42dp"
-        android:background="@drawable/rounded_rectangle"
-        android:gravity="center"
-        android:text="Sobre la app"
-        android:textColor="#D4812A"
-        android:textSize="16sp"
-        android:fontFamily="@font/baloo"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.126"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.96"
-        android:clickable="true"
-        android:focusable="true"/>
-
-    <TextView
         android:id="@+id/random"
         android:layout_width="142dp"
         android:layout_height="42dp"
         android:background="@drawable/rounded_rectangle"
+        android:fontFamily="@font/baloo"
         android:gravity="center"
         android:text="Descubrir"
         android:textColor="#D4812A"
         android:textSize="16sp"
-        android:fontFamily="@font/baloo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.825"
+        app:layout_constraintHorizontal_bias="0.873"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.96" />
+        app:layout_constraintTop_toBottomOf="@+id/chatbox"
+        app:layout_constraintVertical_bias="0.565" />
+
+    <TextView
+        android:id="@+id/about"
+        android:layout_width="150dp"
+        android:layout_height="42dp"
+        android:background="@drawable/rounded_rectangle"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/baloo"
+        android:gravity="center"
+        android:text="Sobre la app"
+        android:textColor="#D4812A"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.13"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chatbox"
+        app:layout_constraintVertical_bias="0.565" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
