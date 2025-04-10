@@ -1,7 +1,10 @@
 package com.example.melodia
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -24,9 +27,22 @@ class AboutActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        val textView = findViewById<TextView>(R.id.option1)
+        textView.setOnClickListener {
+            val url = "https://github.com/NC09dev/MelodIA"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            startActivity(intent)
+        }
+
+        val textView2 = findViewById<TextView>(R.id.option2)
+        textView2.setOnClickListener {
+            val url = "https://www.instagram.com/p/DH4uFL4O7S2/?img_index=1&igsh=djJoZnVyY3k2ZmQ4"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            startActivity(intent)
+        }
     }
 
-    // Método para ocultar los botones de navegación y la barra de estado
     private fun hideSystemUI() {
         window.decorView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY

@@ -4,8 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_image"
-    android:padding="24dp">
+    android:background="@drawable/background_gradient"
+    >
+
+    <ImageView
+        android:id="@+id/imagenEncima"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/background_image"
+        android:scaleType="centerCrop" />
 
     <!-- Título "Ingresar" -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -60,12 +67,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/bagelfont"
-            android:shadowColor="#1976D2"
-            android:shadowDx="10"
-            android:shadowDy="10"
-            android:shadowRadius="10"
+            android:shadowColor="#60F1A4"
+            android:shadowDx="15"
+            android:shadowDy="2"
+            android:shadowRadius="3"
             android:text="Ingresar"
-            android:textColor="#FF0099"
+            android:textColor="#F90370"
             android:textSize="36sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -132,12 +139,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:backgroundTint="#FF0099"
+            android:backgroundTint="#F90370"
             android:fontFamily="@font/baloo"
             android:paddingHorizontal="40dp"
             android:paddingVertical="12dp"
             android:text="¡FUIMONOS!"
-            android:textColor="#03A9F4"
+            android:textColor="#7BEEAF"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
