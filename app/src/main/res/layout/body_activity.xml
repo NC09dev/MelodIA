@@ -9,53 +9,33 @@
     android:background="#F5B926"
     tools:context=".MainActivity">
 
-    <!-- Rectángulo con color #FFF78E -->
+
     <View
         android:id="@+id/rectangulo"
         android:layout_width="match_parent"
         android:layout_height="59dp"
-        android:background="@drawable/rounded_rectangle"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:alpha="0.5"
+        android:background="@drawable/rounded_bottom"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.0"/>
-
-    <!-- Texto dentro del rectángulo -->
-
-    <View
-        android:id="@+id/rep"
-        android:layout_width="309dp"
-        android:layout_height="42dp"
-        android:background="@drawable/rounded_rectangle"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.699" />
-
-    <View
-        android:id="@+id/bar"
-        android:layout_width="240dp"
-        android:layout_height="5dp"
-        android:background="#F90370"
-        app:layout_constraintBottom_toBottomOf="@+id/rep"
-        app:layout_constraintEnd_toEndOf="@+id/rep"
-        app:layout_constraintHorizontal_bias="0.533"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/rep" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <EditText
         android:id="@+id/chatbox"
         android:layout_width="match_parent"
         android:layout_height="71dp"
+        android:alpha="0.5"
         android:background="@drawable/rounded_rectangle"
         android:fontFamily="@font/baloo"
         android:gravity="center"
-        android:singleLine="true"
-        android:maxLines="1"
         android:hint="¿Qué quieres escuchar hoy?"
         android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"
         android:textColor="#D4812A"
+        android:textColorHint="#D4812A"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -64,15 +44,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.857" />
 
-    <View
-        android:id="@+id/rectangulo2"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="#FFF78E"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+    <!-- Línea decorativa arriba -->
+
+    <!-- Imagen de referencia -->
+
+    <!-- Ícono de configuración -->
 
     <ImageView
         android:id="@+id/imageView"
@@ -83,23 +59,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rectangulo"
-        app:layout_constraintVertical_bias="0.086"
-        />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.178" />
 
+    <!-- Botón de enviar prompt -->
 
     <ImageView
         android:id="@+id/settings"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:src="@drawable/settings"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/rectangulo"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.955"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.014"
-        />
+        app:layout_constraintHorizontal_bias="0.944"
+        app:layout_constraintStart_toStartOf="@+id/rectangulo"
+        app:layout_constraintTop_toTopOf="@+id/rectangulo"
+        app:layout_constraintVertical_bias="0.517" />
 
     <ImageView
         android:id="@+id/prompt"
@@ -110,35 +85,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.91"
         app:layout_constraintStart_toStartOf="@+id/chatbox"
-        app:layout_constraintTop_toTopOf="@+id/chatbox"
-        />
+        app:layout_constraintTop_toTopOf="@+id/chatbox" />
 
-    <ImageView
-        android:id="@+id/heart"
-        android:layout_width="40dp"
-        android:layout_height="32dp"
-        android:src="@drawable/heart"
-        app:layout_constraintBottom_toBottomOf="@+id/rep"
-        app:layout_constraintEnd_toEndOf="@+id/rep"
-        app:layout_constraintHorizontal_bias="0.944"
-        app:layout_constraintStart_toStartOf="@+id/rep"
-        app:layout_constraintTop_toTopOf="@+id/rep"
-        />
+    <!-- Título -->
 
-    <ImageView
-        android:id="@+id/stop"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@drawable/stop"
-        app:layout_constraintBottom_toTopOf="@+id/rep"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+    <!-- Botón de descubrir -->
+
+    <!-- Botón de sobre la app -->
+
 
     <TextView
         android:id="@+id/Melodia"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/bagelfont"
         android:shadowColor="#1976D2"
         android:shadowDx="2"
         android:shadowDy="2"
@@ -146,17 +106,19 @@
         android:text="MELODIA"
         android:textColor="#F90370"
         android:textSize="20sp"
-        android:fontFamily="@font/bagelfont"
         app:layout_constraintBottom_toBottomOf="@+id/rectangulo"
         app:layout_constraintEnd_toEndOf="@+id/rectangulo"
         app:layout_constraintHorizontal_bias="0.08"
         app:layout_constraintStart_toStartOf="@+id/rectangulo"
-        app:layout_constraintTop_toTopOf="@+id/rectangulo" />
+        app:layout_constraintTop_toTopOf="@+id/rectangulo"
+        app:layout_constraintVertical_bias="0.533" />
 
     <TextView
         android:id="@+id/random"
         android:layout_width="142dp"
         android:layout_height="42dp"
+        android:layout_marginBottom="32dp"
+        android:alpha="0.5"
         android:background="@drawable/rounded_rectangle"
         android:fontFamily="@font/baloo"
         android:gravity="center"
@@ -165,15 +127,15 @@
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.873"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chatbox"
-        app:layout_constraintVertical_bias="0.565" />
+        app:layout_constraintHorizontal_bias="0.921"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/about"
         android:layout_width="150dp"
         android:layout_height="42dp"
+        android:layout_marginBottom="32dp"
+        android:alpha="0.5"
         android:background="@drawable/rounded_rectangle"
         android:clickable="true"
         android:focusable="true"
@@ -184,9 +146,74 @@
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.13"
+        app:layout_constraintHorizontal_bias="0.099"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <View
+        android:id="@+id/rep"
+        android:layout_width="309dp"
+        android:layout_height="42dp"
+        android:alpha="0.5"
+        android:background="@drawable/rounded_rectangle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chatbox"
-        app:layout_constraintVertical_bias="0.565" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.727" />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="243dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:progressTint="#F90370"
+        android:thumbTint="#D4812A"
+        app:layout_constraintBottom_toBottomOf="@+id/rep"
+        app:layout_constraintEnd_toEndOf="@+id/rep"
+        app:layout_constraintStart_toStartOf="@+id/rep"
+        app:layout_constraintTop_toTopOf="@+id/rep"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.5"/>
+
+    <ImageView
+        android:id="@+id/heart"
+        android:layout_width="40dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/heart"
+        app:layout_constraintBottom_toBottomOf="@+id/rep"
+        app:layout_constraintEnd_toEndOf="@+id/rep"
+        app:layout_constraintTop_toTopOf="@+id/rep"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.5"/>
+
+    <LinearLayout
+        android:id="@+id/playerControls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btnPlayPause"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="Reproducir o pausar"
+        android:scaleType="centerCrop"
+        android:src="@drawable/play"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.628" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/menuContainer"
+    android:layout_width="251dp"
+    android:layout_height="223dp"
+    android:orientation="vertical"
+    android:background="@drawable/popup_background"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/configuration_menu"
+        android:layout_width="match_parent"
+        android:fontFamily="@font/bagelfont"
+        android:layout_height="wrap_content"
+        android:background="@drawable/item_background"
+        android:backgroundTint="#F47A7A"
+        android:text="CONFIGURACIÓN"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:textColor="#010542"
+        android:clickable="true"
+        android:focusable="true"/>
+
+    <TextView
+        android:id="@+id/saves_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/bagelfont"
+        android:background="@drawable/item_background"
+        android:backgroundTint="#A5F7A5"
+        android:gravity="center"
+        android:text="MIS MELODÍAS"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:textColor="#010542"
+        android:clickable="true"
+        android:focusable="true"/>
+
+    <TextView
+        android:id="@+id/profile_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/item_background"
+        android:backgroundTint="#CFA5F7"
+        android:fontFamily="@font/bagelfont"
+        android:gravity="center"
+        android:text="PERFIL"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:textColor="#010542"
+        android:clickable="true"
+        android:focusable="true" />
+</LinearLayout>

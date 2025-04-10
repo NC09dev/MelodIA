@@ -1,92 +1,120 @@
 package com.example.melodia
 
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.*
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.widget.ImageView
-import android.view.LayoutInflater
-import android.widget.PopupWindow
 
 class bodyActivity : AppCompatActivity() {
+
+    private lateinit var mediaPlayer: MediaPlayer
+    private lateinit var seekBar: SeekBar
+    private lateinit var handler: Handler
+    private var isUserSeeking = false
+    private var isPlaying = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Establecer el layout
         setContentView(R.layout.body_activity)
 
-        // Forzar modo claro
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
-        // Habilitar bordes sin recortes
         enableEdgeToEdge()
-
-        // Ocultar botones de navegación y barra de estado
         hideSystemUI()
 
-        // Ajustar los insets del sistema
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // Ir a AboutActivity desde el TextView
         val aboutTextView = findViewById<TextView>(R.id.about)
         aboutTextView.setOnClickListener {
-            val intent = Intent(this, AboutActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, AboutActivity::class.java))
         }
 
-        // Menú desplegable personalizado
         val menuIcon = findViewById<ImageView>(R.id.settings)
         menuIcon.setOnClickListener {
-            val inflater = layoutInflater
-            val popupView = inflater.inflate(R.layout.popup_menu, null)
+            val popupView = layoutInflater.inflate(R.layout.popup_menu, null)
+            val popupWindow = PopupWindow(popupView, 400, 400, true)
 
-            val popupWindow = PopupWindow(
-                popupView,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                true
-            )
+            val itemConfig = popupView.findViewById<TextView>(R.id.configuration_menu)
+            val itemMelodias = popupView.findViewById<TextView>(R.id.saves_menu)
+            val itemPerfil = popupView.findViewById<TextView>(R.id.profile_menu)
+
+            itemConfig.setOnClickListener {
+                startActivity(Intent(this, Optionsactivity::class.java))
+                popupWindow.dismiss()
+            }
+
+            itemMelodias.setOnClickListener {
+                startActivity(Intent(this, Savesactivity::class.java))
+                popupWindow.dismiss()
+            }
+
+            itemPerfil.setOnClickListener {
+                startActivity(Intent(this, Profileactivity::class.java))
+                popupWindow.dismiss()
+            }
 
             popupWindow.elevation = 10f
-            popupWindow.setBackgroundDrawable(getDrawable(R.drawable.popup_background))
-            popupWindow.isOutsideTouchable = true
+            popupWindow.showAsDropDown(menuIcon, 0, 20)
+        }
 
-            // Mostrar debajo del ícono
-            popupWindow.showAsDropDown(menuIcon, 0, 10)
+        // 🎵 Reproductor de audio
+        mediaPlayer = MediaPlayer.create(this, R.raw.test)
 
-            // Listeners de opciones del menú
-            val configuracion = popupView.findViewById<TextView>(R.id.menu_configuracion)
-            val melodias = popupView.findViewById<TextView>(R.id.menu_mis_melodias)
-            val perfil = popupView.findViewById<TextView>(R.id.menu_perfil)
+        val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
+        seekBar = findViewById(R.id.seekBar)
 
-            configuracion.setOnClickListener {
-                // Acción para configuración
-                popupWindow.dismiss()
+        seekBar.max = mediaPlayer.duration
+
+        handler = Handler(Looper.getMainLooper())
+        val updateSeekBar = object : Runnable {
+            override fun run() {
+                if (!isUserSeeking) {
+                    seekBar.progress = mediaPlayer.currentPosition
+                }
+                handler.postDelayed(this, 1000)
+            }
+        }
+        handler.post(updateSeekBar)
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) mediaPlayer.seekTo(progress)
             }
 
-            melodias.setOnClickListener {
-                // Acción para melodías
-                popupWindow.dismiss()
-            }
+            override fun onStartTrackingTouch(sb: SeekBar?) { isUserSeeking = true }
+            override fun onStopTrackingTouch(sb: SeekBar?) { isUserSeeking = false }
+        })
 
-            perfil.setOnClickListener {
-                // Acción para perfil
-                popupWindow.dismiss()
+        playPauseBtn.setOnClickListener {
+            if (isPlaying) {
+                mediaPlayer.pause()
+                playPauseBtn.setImageResource(R.drawable.play)
+            } else {
+                mediaPlayer.start()
+                playPauseBtn.setImageResource(R.drawable.pause)
             }
+            isPlaying = !isPlaying
+        }
+
+
+        mediaPlayer.setOnCompletionListener {
+            seekBar.progress = 0
+            playPauseBtn.setImageResource(R.drawable.play)
+            isPlaying = false
         }
     }
 
-    // Método para ocultar los botones de navegación y la barra de estado
     private fun hideSystemUI() {
         window.decorView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -96,5 +124,11 @@ class bodyActivity : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
+        mediaPlayer.release()
     }
 }
