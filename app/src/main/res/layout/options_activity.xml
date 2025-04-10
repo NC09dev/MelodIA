@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF9FAA"
+    tools:context=".MainActivity">
+
+    <!-- Botón de volver -->
+
+    <!-- Título -->
+
+    <!-- Botón IDIOMA -->
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/bagelfont"
+        android:shadowColor="#F7DB80"
+        android:shadowDx="10    "
+        android:shadowDy="2"
+        android:shadowRadius="3"
+        android:text="CONFIGUACIÓN"
+        android:textColor="#010542"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Botón VOLUMEN -->
+
+    <!-- Imagen inferior (engranajes) -->
+
+    <Button
+        android:id="@+id/languageButton"
+        android:layout_width="439dp"
+        android:layout_height="110dp"
+        android:layout_marginBottom="560dp"
+        android:backgroundTint="#FFA726"
+        android:fontFamily="@font/baloo"
+        android:text="IDIOMA"
+        android:textColor="#FFDF8E"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/volumeButton"
+        android:layout_width="453dp"
+        android:layout_height="109dp"
+        android:layout_marginBottom="460dp"
+        android:backgroundTint="#7BEEAF"
+        android:fontFamily="@font/baloo"
+        android:text="VOLUMEN"
+        android:textColor="#BC724F"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/settingsImage"
+        android:layout_width="403dp"
+        android:layout_height="411dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="Ilustración de configuración"
+        android:scaleType="fitCenter"
+        android:src="@drawable/reparador_removebg_preview"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/volumeButton"
+        app:layout_constraintWidth_percent="0.6" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
