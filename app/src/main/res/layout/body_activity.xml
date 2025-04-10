@@ -51,6 +51,8 @@
         android:background="@drawable/rounded_rectangle"
         android:fontFamily="@font/baloo"
         android:gravity="center"
+        android:singleLine="true"
+        android:maxLines="1"
         android:hint="¿Qué quieres escuchar hoy?"
         android:inputType="text"
         android:textColor="#D4812A"
@@ -87,7 +89,7 @@
 
 
     <ImageView
-        android:id="@+id/settigs"
+        android:id="@+id/settings"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:src="@drawable/settings"
@@ -126,14 +128,12 @@
     <ImageView
         android:id="@+id/stop"
         android:layout_width="100dp"
-        android:layout_height= "100dp"
+        android:layout_height="100dp"
         android:src="@drawable/stop"
         app:layout_constraintBottom_toTopOf="@+id/rep"
-        app:layout_constraintEnd_toEndOf="@+id/settigs"
-        app:layout_constraintHorizontal_bias="0.524"
-        app:layout_constraintStart_toStartOf="@+id/rectangulo"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
-        app:layout_constraintVertical_bias="0.492" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <TextView
         android:id="@+id/Melodia"

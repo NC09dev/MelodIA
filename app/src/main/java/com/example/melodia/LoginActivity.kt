@@ -44,7 +44,6 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 // Aquí puedes validar contra una base de datos, o simular con valores fijos
                 if (email == "test@gmail.com" && password == "1234") {
-                    Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
 
                     // Ir a otra actividad (MainActivity por ejemplo)
                     val intent = Intent(this, bodyActivity::class.java)
