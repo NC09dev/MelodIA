@@ -36,6 +36,13 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".Profileactivity"
             android:screenOrientation="portrait"/>
+
+        <activity android:name=".Optionsactivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Savesactivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Profileactivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 
