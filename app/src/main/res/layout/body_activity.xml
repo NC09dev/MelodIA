@@ -16,9 +16,7 @@
         android:layout_height="59dp"
         android:alpha="0.5"
         android:background="@drawable/rounded_bottom"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
@@ -29,17 +27,21 @@
         android:alpha="0.5"
         android:background="@drawable/rounded_rectangle"
         android:fontFamily="@font/baloo"
-        android:gravity="center"
+        android:gravity="center_vertical"
         android:hint="¿Qué quieres escuchar hoy?"
-        android:inputType="text"
-        android:maxLines="1"
+        android:textColorHighlight="#9C27B0"
+        android:inputType="text|textNoSuggestions"
+        android:scrollHorizontally="true"
+        android:ellipsize="end"
         android:singleLine="true"
+        android:maxLines="1"
         android:textColor="#D4812A"
         android:textColorHint="#D4812A"
         android:textSize="18sp"
+        android:paddingStart="16dp"
+        android:paddingEnd="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.857" />
@@ -113,41 +115,44 @@
         app:layout_constraintTop_toTopOf="@+id/rectangulo"
         app:layout_constraintVertical_bias="0.533" />
 
-    <TextView
-        android:id="@+id/random"
-        android:layout_width="142dp"
-        android:layout_height="42dp"
-        android:layout_marginBottom="32dp"
-        android:alpha="0.5"
-        android:background="@drawable/rounded_rectangle"
-        android:fontFamily="@font/baloo"
+    <LinearLayout
+        android:id="@+id/bottomButtons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:orientation="horizontal"
         android:gravity="center"
-        android:text="Descubrir"
-        android:textColor="#D4812A"
-        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:alpha="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.921"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <TextView
-        android:id="@+id/about"
-        android:layout_width="150dp"
-        android:layout_height="42dp"
-        android:layout_marginBottom="32dp"
-        android:alpha="0.5"
-        android:background="@drawable/rounded_rectangle"
-        android:clickable="true"
-        android:focusable="true"
-        android:fontFamily="@font/baloo"
-        android:gravity="center"
-        android:text="Sobre la app"
-        android:textColor="#D4812A"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.099"
-        app:layout_constraintStart_toStartOf="parent" />
+        <TextView
+            android:id="@+id/about"
+            android:layout_width="150dp"
+            android:layout_height="42dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/rounded_rectangle"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/baloo"
+            android:gravity="center"
+            android:text="Sobre la app"
+            android:textColor="#D4812A"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/random"
+            android:layout_width="142dp"
+            android:layout_height="42dp"
+            android:background="@drawable/rounded_rectangle"
+            android:fontFamily="@font/baloo"
+            android:gravity="center"
+            android:text="Descubrir"
+            android:textColor="#D4812A"
+            android:textSize="16sp" />
+    </LinearLayout>
 
     <View
         android:id="@+id/rep"

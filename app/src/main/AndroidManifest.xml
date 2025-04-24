@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" >
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- 📡 Permiso para usar Internet -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- 📡 Permiso para acceder al estado de la red (comprobar si hay conexión) -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <!-- 📁 Permiso para leer y escribir en el almacenamiento (si es necesario) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -12,38 +22,33 @@
         android:configChanges="uiMode"
         android:supportsRtl="true"
         android:theme="@style/Theme.MelodIA"
-        tools:targetApi="31" >
+        tools:targetApi="31">
+
         <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".AboutActivity"
             android:screenOrientation="portrait"/>
+
         <activity android:name=".bodyActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|keyboardHidden" />
-            />
-
-
-        <activity android:name=".Optionsactivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Savesactivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Profileactivity"
             android:screenOrientation="portrait"/>
 
         <activity android:name=".Optionsactivity"
             android:screenOrientation="portrait"/>
+
         <activity android:name=".Savesactivity"
             android:screenOrientation="portrait"/>
+
         <activity android:name=".Profileactivity"
             android:screenOrientation="portrait"/>
+
     </application>
-
 
 </manifest>
