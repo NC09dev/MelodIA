@@ -1,23 +1,19 @@
 package com.example.melodia
 
+import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject
 import java.io.IOException
-import android.content.Context
-import android.view.inputmethod.InputMethodManager
+import kotlin.random.Random
 
 class bodyActivity : AppCompatActivity() {
 
@@ -26,19 +22,95 @@ class bodyActivity : AppCompatActivity() {
     private lateinit var handler: Handler
     private var isUserSeeking = false
     private var isPlaying = false
+    private var currentTrackUrl: String? = null
+    private lateinit var mainImage: ImageView
+    private val imageList = listOf(
+        R.drawable.design1,
+        R.drawable.design2,
+        R.drawable.design3,
+        R.drawable.design4,
+        R.drawable.design5,
+        R.drawable.design6,
+        R.drawable.design7,
+        R.drawable.design8
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.body_activity)
 
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        // Habilitar bordes sin recortes
         enableEdgeToEdge()
+
+        // Ocultar botones de navegación y barra de estado
         hideSystemUI()
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        handler = Handler(Looper.getMainLooper())
+
+        seekBar = findViewById(R.id.seekBar)
+        mainImage = findViewById(R.id.imageView)
+        mainImage.setImageResource(R.drawable.icono) // imagen inicial
+
+        val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
+
+        mediaPlayer = MediaPlayer.create(this, R.raw.test)
+        seekBar.max = mediaPlayer.duration
+
+        val updateSeekBar = object : Runnable {
+            override fun run() {
+                if (!isUserSeeking) {
+                    seekBar.progress = mediaPlayer.currentPosition
+                }
+                handler.postDelayed(this, 1000)
+            }
+        }
+        handler.post(updateSeekBar)
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) mediaPlayer.seekTo(progress)
+            }
+            override fun onStartTrackingTouch(sb: SeekBar?) { isUserSeeking = true }
+            override fun onStopTrackingTouch(sb: SeekBar?) { isUserSeeking = false }
+        })
+
+        playPauseBtn.setOnClickListener {
+            if (isPlaying) {
+                mediaPlayer.pause()
+                playPauseBtn.setImageResource(R.drawable.play)
+            } else {
+                mediaPlayer.start()
+                playPauseBtn.setImageResource(R.drawable.pause)
+            }
+            isPlaying = !isPlaying
+        }
+
+        mediaPlayer.setOnCompletionListener {
+            seekBar.progress = seekBar.max
+            playPauseBtn.setImageResource(R.drawable.play)
+            isPlaying = false
+            handler.postDelayed({ seekBar.progress = 0 }, 500)
+        }
+
+        val promptBtn = findViewById<ImageView>(R.id.prompt)
+        val chatBox = findViewById<EditText>(R.id.chatbox)
+
+        promptBtn.setOnClickListener {
+            val texto = chatBox.text.toString().trim()
+            if (texto.isEmpty()) {
+                Toast.makeText(this, "Escribe un mensaje para generar música 🎵", Toast.LENGTH_SHORT).show()
+            } else {
+                generarMusicaDesdePrompt(texto)
+                chatBox.clearFocus()
+                val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                inputMethodManager?.hideSoftInputFromWindow(chatBox.windowToken, 0)
+            }
+        }
+
+        val random_btn = findViewById<TextView>(R.id.random)
+
+        random_btn.setOnClickListener{
+            generarMusicaDesdePrompt("random")
         }
 
         val aboutTextView = findViewById<TextView>(R.id.about)
@@ -73,87 +145,67 @@ class bodyActivity : AppCompatActivity() {
             popupWindow.elevation = 10f
             popupWindow.showAsDropDown(menuIcon, 0, 20)
         }
+    }
 
-        // 🎵 Reproductor
-        mediaPlayer = MediaPlayer.create(this, R.raw.test)
-        seekBar = findViewById(R.id.seekBar)
-        val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
 
-        seekBar.max = mediaPlayer.duration
-        handler = Handler(Looper.getMainLooper())
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("isPlaying", isPlaying)
+        outState.putInt("seekProgress", seekBar.progress)
+        currentTrackUrl?.let { outState.putString("trackUrl", it) }
+    }
 
-        val updateSeekBar = object : Runnable {
-            override fun run() {
-                if (!isUserSeeking) {
-                    seekBar.progress = mediaPlayer.currentPosition
-                }
-                handler.postDelayed(this, 1000)
-            }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        isPlaying = savedInstanceState.getBoolean("isPlaying", false)
+        val progress = savedInstanceState.getInt("seekProgress", 0)
+        val url = savedInstanceState.getString("trackUrl", null)
+
+        if (url != null) {
+            reproducirDesdeUrl(url, resumeAt = progress, autoStart = isPlaying)
+        } else {
+            seekBar.progress = progress
         }
-        handler.post(updateSeekBar)
+    }
 
-        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) mediaPlayer.seekTo(progress)
-            }
-            override fun onStartTrackingTouch(sb: SeekBar?) { isUserSeeking = true }
-            override fun onStopTrackingTouch(sb: SeekBar?) { isUserSeeking = false }
-        })
-
-        playPauseBtn.setOnClickListener {
-            if (isPlaying) {
-                mediaPlayer.pause()
-                playPauseBtn.setImageResource(R.drawable.play)
-            } else {
+    private fun reproducirDesdeUrl(audioUrl: String, resumeAt: Int = 0, autoStart: Boolean = true) {
+        currentTrackUrl = audioUrl
+        mediaPlayer.release()
+        mediaPlayer = MediaPlayer()
+        mediaPlayer.setDataSource(audioUrl)
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener {
+            seekBar.max = mediaPlayer.duration
+            if (resumeAt > 0) mediaPlayer.seekTo(resumeAt)
+            if (autoStart) {
                 mediaPlayer.start()
-                playPauseBtn.setImageResource(R.drawable.pause)
-            }
-            isPlaying = !isPlaying
-        }
-
-        mediaPlayer.setOnCompletionListener {
-            seekBar.progress = 0
-            playPauseBtn.setImageResource(R.drawable.play)
-            isPlaying = false
-        }
-
-        // 🎤 Generar música con prompt
-        val promptBtn = findViewById<ImageView>(R.id.prompt)
-        val chatBox = findViewById<EditText>(R.id.chatbox)
-
-        promptBtn.setOnClickListener {
-            val texto = chatBox.text.toString().trim()
-
-            when {
-                texto.isEmpty() -> {
-                    Toast.makeText(this, "Escribe un mensaje para generar música 🎵", Toast.LENGTH_SHORT).show()
-                }
-                texto.length > 100 -> {
-                    Toast.makeText(this, "El texto es demasiado largo. Máximo 200 caracteres.", Toast.LENGTH_LONG).show()
-                }
-                else -> {
-                    generarMusicaDesdePrompt(texto)
-                    // Deseleccionar el cuadro de texto (quitar el foco)
-                    chatBox.clearFocus()
-
-                    // Cerrar el teclado
-                    val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-                    inputMethodManager?.hideSoftInputFromWindow(chatBox.windowToken, 0)
-
-                }
+                val nuevaImagen = imageList[Random.nextInt(imageList.size)]
+                mainImage.setImageResource(nuevaImagen)
+                findViewById<ImageButton>(R.id.btnPlayPause).setImageResource(R.drawable.pause)
+                isPlaying = true
             }
         }
+    }
 
-
-
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
+        mediaPlayer.release()
     }
 
     private fun generarMusicaDesdePrompt(prompt: String) {
+        runOnUiThread {
+            Toast.makeText(this@bodyActivity, "🔄 Componiendo música, por favor espera...", Toast.LENGTH_SHORT).show()
+        }
+
         val client = OkHttpClient()
         val json = JSONObject().apply {
             put("prompt", JSONObject().put("text", prompt))
-            put("format", "wav")  // Opcional: puedes cambiar esto a "mp3" o "aac"
-            put("looping", false)  // Opcional: pon esto en true para más bucles
+            put("format", "wav")
+            put("looping", false)
+            put("duration", 30)
+            put("genre", "ambient")
+            put("mood", "calm")
         }
 
         val requestBody = RequestBody.create(
@@ -162,55 +214,42 @@ class bodyActivity : AppCompatActivity() {
         )
 
         val request = Request.Builder()
-            .url("https://public-api.beatoven.ai/api/v1/tracks/compose")  // URL correcta
+            .url("https://public-api.beatoven.ai/api/v1/tracks/compose")
             .addHeader("Authorization", "Bearer LnbcvkbQPBHwSYotbkkE9g")
-            .addHeader("Content-Type", "application/json")  // Cabecera de tipo de contenido
+            .addHeader("Content-Type", "application/json")
             .post(requestBody)
             .build()
-
-        // Mostrar Toast mientras se genera la música
-        runOnUiThread {
-            Toast.makeText(this, "Componiendo música, por favor espera...", Toast.LENGTH_SHORT).show()
-        }
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
-                    Toast.makeText(this@bodyActivity, "Error al conectar con Beatoven: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@bodyActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val responseBody = response.body?.string()
-                println("Response Body: $responseBody") // Registro de depuración
-
-                if (!response.isSuccessful) {
+                val bodyStr = response.body?.string()
+                if (!response.isSuccessful || bodyStr.isNullOrEmpty()) {
                     runOnUiThread {
-                        Toast.makeText(this@bodyActivity, "Error en la API: ${response.code} - ${response.message}", Toast.LENGTH_LONG).show()
-                        Toast.makeText(this@bodyActivity, "Cuerpo de la respuesta: $responseBody", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@bodyActivity, "Error al componer música", Toast.LENGTH_SHORT).show()
                     }
                     return
                 }
 
-                try {
-                    val jsonResponse = JSONObject(responseBody)
-                    val taskId = jsonResponse.getString("task_id")  // Obtener el task_id de la respuesta
+                val jsonResponse = JSONObject(bodyStr)
+                val taskId = jsonResponse.optString("task_id")
+                if (taskId.isNotEmpty()) {
                     runOnUiThread {
-                        Toast.makeText(this@bodyActivity, "Tarea iniciada, task_id: $taskId", Toast.LENGTH_SHORT).show()
                     }
-                    consultarEstadoDeTarea(taskId)  // Consultar el estado de la tarea
-                } catch (e: Exception) {
-                    runOnUiThread {
-                        Toast.makeText(this@bodyActivity, "Error al procesar la respuesta: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
+                    consultarEstadoDeTarea(taskId)
                 }
             }
         })
     }
 
-    private fun consultarEstadoDeTarea(taskId: String) {
+    private fun consultarEstadoDeTarea(taskId: String, reintentos: Int = 0) {
         val client = OkHttpClient()
-        val url = "https://public-api.beatoven.ai/api/v1/tasks/$taskId"  // URL correcta
+        val url = "https://public-api.beatoven.ai/api/v1/tasks/$taskId"
 
         val request = Request.Builder()
             .url(url)
@@ -218,79 +257,51 @@ class bodyActivity : AppCompatActivity() {
             .get()
             .build()
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    runOnUiThread {
-                        Toast.makeText(this@bodyActivity, "Error al consultar el estado de la canción: ${e.message}", Toast.LENGTH_LONG).show()
-                    }
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    Toast.makeText(this@bodyActivity, "Error de red: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
+            }
 
-                override fun onResponse(call: Call, response: Response) {
-                    val bodyStr = response.body?.string()
-                    println("Response Body: $bodyStr")  // Ver respuesta en Logcat
+            override fun onResponse(call: Call, response: Response) {
+                val bodyStr = response.body?.string()
+                val body = JSONObject(bodyStr ?: "{}")
+                val status = body.optString("status", "unknown")
+                val meta = body.optJSONObject("meta")
+                val trackUrl = meta?.optString("track_url") ?: meta?.optString("audio_url")
 
-                    if (!response.isSuccessful) {
-                        runOnUiThread {
-                            Toast.makeText(this@bodyActivity, "Error al consultar estado: ${response.code} - ${response.message}", Toast.LENGTH_LONG).show()
-                            Toast.makeText(this@bodyActivity, "Cuerpo de la respuesta: $bodyStr", Toast.LENGTH_LONG).show()
-                        }
-                        return
-                    }
-
-                    try {
-                        val body = JSONObject(bodyStr ?: "{}")
-                        val status = body.optString("status", "pending")
-
-                        runOnUiThread {
-                            Toast.makeText(this@bodyActivity, "Estado de la tarea: $status", Toast.LENGTH_SHORT).show()
-                        }
-
-                        if (status == "composed") {
-                            val trackUrl = body.optString("track_url", null)
-                            if (trackUrl != null && trackUrl.isNotEmpty()) {
-                                runOnUiThread {
-                                    Toast.makeText(this@bodyActivity, "¡Música lista! 🎶", Toast.LENGTH_SHORT).show()
-                                    reproducirDesdeUrl(trackUrl)  // Reproducir la pista cuando esté lista
-                                }
-                            } else {
-                                runOnUiThread {
-                                    Toast.makeText(this@bodyActivity, "No se encontró la URL del audio. Intenta nuevamente.", Toast.LENGTH_SHORT).show()
-                                }
+                when (status) {
+                    "composed" -> {
+                        if (!trackUrl.isNullOrEmpty()) {
+                            runOnUiThread {
+                                Toast.makeText(this@bodyActivity, "¡Música lista!", Toast.LENGTH_SHORT).show()
+                                reproducirDesdeUrl(trackUrl)
                             }
+                        } else if (reintentos < 3) {
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                consultarEstadoDeTarea(taskId, reintentos + 1)
+                            }, 3000)
                         } else {
-                            // Si el estado aún no está "composed", intenta nuevamente después de un tiempo
-                            consultarEstadoDeTarea(taskId)  // Reintentar
+                            runOnUiThread {
+                                Toast.makeText(this@bodyActivity, "No se pudo obtener la pista.", Toast.LENGTH_LONG).show()
+                            }
                         }
-                    } catch (e: Exception) {
+                    }
+                    "pending", "in_progress", "composing" -> {
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            consultarEstadoDeTarea(taskId, reintentos)
+                        }, 5000)
+                    }
+                    else -> {
                         runOnUiThread {
-                            Toast.makeText(this@bodyActivity, "Error al procesar la respuesta: ${e.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@bodyActivity, "Estado inesperado: $status", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
-
-            })
-        }, 5000)  // Espera de 5 segundos
+            }
+        })
     }
-
-
-
-
-
-    private fun reproducirDesdeUrl(audioUrl: String) {
-        mediaPlayer.release()  // Release the previous media player instance if it exists
-        mediaPlayer = MediaPlayer()  // Create a new instance
-        mediaPlayer.setDataSource(audioUrl)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            it.start()
-            findViewById<ImageButton>(R.id.btnPlayPause).setImageResource(R.drawable.pause)
-            isPlaying = true
-        }
-    }
-
-
-
 
     private fun hideSystemUI() {
         window.decorView.systemUiVisibility = (
@@ -301,11 +312,5 @@ class bodyActivity : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        handler.removeCallbacksAndMessages(null)
-        mediaPlayer.release()
     }
 }
