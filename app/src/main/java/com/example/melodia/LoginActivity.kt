@@ -7,14 +7,18 @@ import android.widget.*
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.firebase.auth.FirebaseAuth
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class LoginActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_activity)
+
+        auth = FirebaseAuth.getInstance()
 
         // Forzar modo claro
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -32,7 +36,6 @@ class LoginActivity : AppCompatActivity() {
         val passwordEditText = findViewById<EditText>(R.id.etPassword)
         val loginButton = findViewById<Button>(R.id.btnLogin)
         val forgotPasswordText = findViewById<TextView>(R.id.tvForgotPassword)
-        val createAccountText = findViewById<TextView>(R.id.tvRegister)
 
         // Listener para botón de login
         loginButton.setOnClickListener {
@@ -40,30 +43,40 @@ class LoginActivity : AppCompatActivity() {
             val password = passwordEditText.text.toString()
 
             if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Por favor completa todos los campos", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Por favor completa todos los campos", Toast.LENGTH_SHORT)
+                    .show()
             } else {
                 // Aquí puedes validar contra una base de datos, o simular con valores fijos
-                if (email == "test@gmail.com" && password == "1234") {
+                auth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this) { task ->
+                        if (task.isSuccessful) {
+                            val intent = Intent(this, bodyActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            Toast.makeText(
+                                this,
+                                "Error: ${task.exception?.message}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
 
-                    // Ir a otra actividad (MainActivity por ejemplo)
-                    val intent = Intent(this, bodyActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                } else {
-                    Toast.makeText(this, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show()
-                }
             }
         }
-
         // Listener para "¿Olvidaste tu contraseña?"
         forgotPasswordText.setOnClickListener {
             Toast.makeText(this, "Redirigir a recuperación de contraseña", Toast.LENGTH_SHORT).show()
         }
 
         // Listener para "Crear cuenta"
-        createAccountText.setOnClickListener {
-            Toast.makeText(this, "Redirigir a registro", Toast.LENGTH_SHORT).show()
+        val tvRegister = findViewById<Button>(R.id.tvRegister)
+
+        tvRegister.setOnClickListener {
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
         }
+
     }
     // Método para ocultar los botones de navegación y la barra de estado
     private fun hideSystemUI() {
@@ -77,4 +90,3 @@ class LoginActivity : AppCompatActivity() {
                 )
     }
 }
-

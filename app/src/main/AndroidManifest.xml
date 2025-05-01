@@ -33,6 +33,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".PasswordActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".RegisterActivity"
+            android:screenOrientation="portrait"/>
 
         <activity android:name=".AboutActivity"
             android:screenOrientation="portrait"/>
@@ -46,7 +51,7 @@
         <activity android:name=".Savesactivity"
             android:screenOrientation="portrait"/>
 
-        <activity android:name=".Profileactivity"
+        <activity android:name=".profileActivity"
             android:screenOrientation="portrait"/>
 
     </application>

@@ -138,7 +138,7 @@ class bodyActivity : AppCompatActivity() {
             }
 
             itemPerfil.setOnClickListener {
-                startActivity(Intent(this, Profileactivity::class.java))
+                startActivity(Intent(this, profileActivity::class.java))
                 popupWindow.dismiss()
             }
 
