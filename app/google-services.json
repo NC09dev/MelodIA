@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "638071324880",
+    "project_id": "melodia-290bb",
+    "storage_bucket": "melodia-290bb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:638071324880:android:0afccaa49e83b74f905ed5",
+        "android_client_info": {
+          "package_name": "com.example.melodia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBG82i2hByBke1UJxHfX3dBl3Ro4y3H_iU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
