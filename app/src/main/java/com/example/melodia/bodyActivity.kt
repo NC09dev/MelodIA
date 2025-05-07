@@ -3,6 +3,7 @@ package com.example.melodia
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.*
 import android.view.View
@@ -17,7 +18,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject
 import java.io.IOException
 import java.util.*
-import kotlin.random.Random
 
 class bodyActivity : AppCompatActivity() {
 
@@ -42,10 +42,7 @@ class bodyActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Aplicar idioma guardado
         aplicarIdiomaGuardado()
-
         setContentView(R.layout.body_activity)
         enableEdgeToEdge()
         hideSystemUI()
@@ -53,6 +50,7 @@ class bodyActivity : AppCompatActivity() {
         handler = Handler(Looper.getMainLooper())
 
         seekBar = findViewById(R.id.seekBar)
+        seekBar.max = 100
         mainImage = findViewById(R.id.imageView)
         mainImage.setImageResource(R.drawable.icono)
 
@@ -61,13 +59,20 @@ class bodyActivity : AppCompatActivity() {
         spinner.visibility = View.GONE
 
         val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
+        mediaPlayer = MediaPlayer()
 
-        mediaPlayer = MediaPlayer.create(this, R.raw.test)
-        seekBar.max = mediaPlayer.duration
+        // Recupera y aplica el volumen guardado
+        val prefs = getSharedPreferences("config", Context.MODE_PRIVATE)
+        val savedVolume = prefs.getInt("user_volume", -1)
+
+        if (savedVolume != -1) {
+            val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, savedVolume, 0)
+        }
 
         val updateSeekBar = object : Runnable {
             override fun run() {
-                if (!isUserSeeking) {
+                if (!isUserSeeking && mediaPlayer.isPlaying) {
                     seekBar.progress = mediaPlayer.currentPosition
                 }
                 handler.postDelayed(this, 1000)
@@ -77,7 +82,7 @@ class bodyActivity : AppCompatActivity() {
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) mediaPlayer.seekTo(progress)
+                if (fromUser && mediaPlayer.isPlaying) mediaPlayer.seekTo(progress)
             }
 
             override fun onStartTrackingTouch(sb: SeekBar?) { isUserSeeking = true }
@@ -173,10 +178,19 @@ class bodyActivity : AppCompatActivity() {
 
     private fun reproducirDesdeUrl(audioUrl: String, resumeAt: Int = 0, autoStart: Boolean = true) {
         currentTrackUrl = audioUrl
-        mediaPlayer.release()
-        mediaPlayer = MediaPlayer()
+
+        if (::mediaPlayer.isInitialized) {
+            try {
+                mediaPlayer.reset()
+            } catch (e: Exception) {
+                mediaPlayer.release()
+                mediaPlayer = MediaPlayer()
+            }
+        } else {
+            mediaPlayer = MediaPlayer()
+        }
+
         mediaPlayer.setDataSource(audioUrl)
-        mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
             seekBar.max = mediaPlayer.duration
             if (resumeAt > 0) mediaPlayer.seekTo(resumeAt)
@@ -187,12 +201,19 @@ class bodyActivity : AppCompatActivity() {
                 isPlaying = true
             }
         }
+        mediaPlayer.setOnCompletionListener {
+            seekBar.progress = seekBar.max
+            findViewById<ImageButton>(R.id.btnPlayPause).setImageResource(R.drawable.play)
+            isPlaying = false
+            handler.postDelayed({ seekBar.progress = 0 }, 500)
+        }
+        mediaPlayer.prepareAsync()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacksAndMessages(null)
-        mediaPlayer.release()
+        if (::mediaPlayer.isInitialized) mediaPlayer.release()
     }
 
     private fun generarMusicaDesdePrompt(prompt: String) {

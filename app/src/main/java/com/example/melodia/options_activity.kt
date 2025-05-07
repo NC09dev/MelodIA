@@ -1,7 +1,8 @@
 package com.example.melodia
 
+import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
+import android.media.AudioManager
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -15,44 +16,49 @@ import java.util.Locale
 class Optionsactivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         loadLocale()
         super.onCreate(savedInstanceState)
-
-        // Habilitar bordes sin recortes
         enableEdgeToEdge()
-
         setContentView(R.layout.options_activity)
-
-        // Ocultar botones de navegación y barra de estado
         hideSystemUI()
 
-        // Referencias a los elementos del layout
         val volumeButton = findViewById<TextView>(R.id.volumeButton)
         val volumeControl = findViewById<LinearLayout>(R.id.volumeControl)
         val seekBar = findViewById<SeekBar>(R.id.seekBar)
         val languageButton = findViewById<TextView>(R.id.languajeButton)
         val backArrow = findViewById<ImageView>(R.id.backArrow)
 
-        // Mostrar u ocultar el control de volumen al tocar el botón
+        // Mostrar u ocultar el control de volumen
         volumeButton.setOnClickListener {
             volumeControl.visibility = if (volumeControl.visibility == View.GONE) View.VISIBLE else View.GONE
         }
 
-        // Cambiar idioma al hacer clic en el botón
-        languageButton.setOnClickListener {
-            toggleLanguage()
-        }
+        // Configurar SeekBar para volumen
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
 
-        // Lógica del SeekBar (por ahora solo imprime el valor en consola)
+        seekBar.max = maxVolume
+        seekBar.progress = currentVolume
+
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                println("Volumen actual: $progress")
+                // Aplicar el volumen al sistema
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
+
+                // Guardar el valor en SharedPreferences
+                val prefs = getSharedPreferences("config", Context.MODE_PRIVATE)
+                prefs.edit().putInt("user_volume", progress).apply()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
+
+        // Botón de cambiar idioma
+        languageButton.setOnClickListener {
+            toggleLanguage()
+        }
 
         // Flecha de regreso
         backArrow.setOnClickListener {
@@ -60,7 +66,6 @@ class Optionsactivity : AppCompatActivity() {
         }
     }
 
-    // Ocultar sistema UI
     private fun hideSystemUI() {
         window.decorView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -72,7 +77,6 @@ class Optionsactivity : AppCompatActivity() {
                 )
     }
 
-    // Cambiar idioma y guardar en SharedPreferences
     private fun toggleLanguage() {
         val currentLocale = resources.configuration.locales[0].language
         val newLocale = if (currentLocale == "es") "en" else "es"
@@ -85,20 +89,18 @@ class Optionsactivity : AppCompatActivity() {
 
         setLocale(newLocale)
 
-        // Reiniciar la actividad para aplicar el idioma
+        // Reiniciar actividad para aplicar idioma
         val intent = Intent(this, Optionsactivity::class.java)
         finish()
         startActivity(intent)
     }
 
-    // Aplicar el idioma desde SharedPreferences
     private fun loadLocale() {
         val sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
         val language = sharedPreferences.getString("App_Lang", "es") ?: "es"
         setLocale(language)
     }
 
-    // Establecer el idioma en la configuración
     private fun setLocale(language: String) {
         val locale = Locale(language)
         Locale.setDefault(locale)
