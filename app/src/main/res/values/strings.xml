@@ -1,3 +1,44 @@
 <resources>
     <string name="app_name">MelodIA</string>
+    <string name="titleText" translatable="false">CONFIGURACIÓN</string>
+    <string name="language">IDIOMA</string>
+    <string name="volumeButton" translatable="false">VOLUMEN</string>
+    <string name="acerca_de" translatable="false">A cerca de...</string>
+    <string name="como_crear_musica" translatable="false">¿CÓMO CREAR MÚSICA?</string>
+    <string name="sobre_nosotros" translatable="false">SOBRE NOSOTROS...</string>
+    <string name="sobre_la_app">Sobre la app</string>
+    <string name="descubrir">Descubrir</string>
+    <string name="hint_que_quieres">¿Qué quieres escuchar hoy?</string>
+    <string name="listado">LISTADO</string>
+    <string name="contrasena">Contraseña</string>
+    <string name="correo">Correo</string>
+    <string name="ingresar">Ingresar</string>
+    <string name="olvidaste_contrasena">¿OLVIDASTE TU CONTRASEÑA?</string>
+    <string name="fuimonos">¡FUIMONOS!</string>
+    <string name="no_tienes_cuenta">¿No tienes cuenta? \nCrea una y disfruta de lo que puedes crear</string>
+    <string name="confirmar">Confirmar</string>
+    <string name="hint_confirmar_contrasena">Confirmar contraseña</string>
+    <string name="mis_melodias">MIS MELODÍAS</string>
+    <string name="perfil">PERFIL</string>
+    <string name="cerrar_sesion">CERRAR SESIÓN</string>
+    <string name="registro">Registro</string>
+    <string name="exportar">EXPORTAR</string>
+    <string name="archivos">ARCHIVOS</string>
+    <string name="fill_all_fields">Por favor completa todos los campos</string>
+    <string name="redirect_to_recovery">Redirigir a recuperación de contraseña</string>
+    <string name="fill_both_fields">Rellena ambos campos</string>
+    <string name="passwords_do_not_match">Las contraseñas no coinciden</string>
+    <string name="password_updated">Contraseña actualizada</string>
+    <string name="error_update_password">Error</string>
+    <string name="user_not_authenticated">Usuario no autenticado</string>
+    <string name="registration_successful">Registro exitoso</string>
+    <string name="registration_error">Error</string>
+    <string name="empty_prompt">Escribe un mensaje para generar música </string>
+    <string name="composing_music">Componiendo melodía ♪♪, por favor espera</string>
+    <string name="music_ready">¡Música lista, que empiece la fiesta! ♪♪</string>
+    <string name="music_error">Error al componer música</string>
+    <string name="track_not_found">No se pudo obtener la pista :(</string>
+    <string name="network_error">Error de red: %1$s</string>
+    <string name="unexpected_status">Estado inesperado: %1$s</string>
+    <string name="error_message">Error: %1$s</string>
 </resources>

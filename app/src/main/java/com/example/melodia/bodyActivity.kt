@@ -2,6 +2,7 @@ package com.example.melodia
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.media.MediaPlayer
 import android.os.*
 import android.view.View
@@ -9,13 +10,13 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.widget.ProgressBar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject
 import java.io.IOException
+import java.util.*
 import kotlin.random.Random
 
 class bodyActivity : AppCompatActivity() {
@@ -41,27 +42,23 @@ class bodyActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Aplicar idioma guardado
+        aplicarIdiomaGuardado()
+
         setContentView(R.layout.body_activity)
-
-        // Habilitar bordes sin recortes
         enableEdgeToEdge()
-
-        // Ocultar botones de navegación y barra de estado
         hideSystemUI()
 
         handler = Handler(Looper.getMainLooper())
 
         seekBar = findViewById(R.id.seekBar)
         mainImage = findViewById(R.id.imageView)
-        mainImage.setImageResource(R.drawable.icono) // imagen inicial
+        mainImage.setImageResource(R.drawable.icono)
 
         spinner = findViewById(R.id.progressBar)
-        val color = Color.parseColor("#7BEEAF") // El color #7BEEAF
-        spinner.indeterminateTintList = ColorStateList.valueOf(color)
-
+        spinner.indeterminateTintList = ColorStateList.valueOf(Color.parseColor("#7BEEAF"))
         spinner.visibility = View.GONE
-
-
 
         val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
 
@@ -82,6 +79,7 @@ class bodyActivity : AppCompatActivity() {
             override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) mediaPlayer.seekTo(progress)
             }
+
             override fun onStartTrackingTouch(sb: SeekBar?) { isUserSeeking = true }
             override fun onStopTrackingTouch(sb: SeekBar?) { isUserSeeking = false }
         })
@@ -110,57 +108,48 @@ class bodyActivity : AppCompatActivity() {
         promptBtn.setOnClickListener {
             val texto = chatBox.text.toString().trim()
             if (texto.isEmpty()) {
-                Toast.makeText(this, "Escribe un mensaje para generar música 🎵", Toast.LENGTH_SHORT).show()
+                showToast(R.string.empty_prompt)
             } else {
                 generarMusicaDesdePrompt(texto)
                 chatBox.clearFocus()
-                val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-                inputMethodManager?.hideSoftInputFromWindow(chatBox.windowToken, 0)
+                (getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+                    ?.hideSoftInputFromWindow(chatBox.windowToken, 0)
             }
         }
 
-        val random_btn = findViewById<TextView>(R.id.random)
-
-        random_btn.setOnClickListener{
+        findViewById<TextView>(R.id.random).setOnClickListener {
             seekBar.visibility = View.VISIBLE
             playPauseBtn.visibility = View.GONE
             generarMusicaDesdePrompt("random")
         }
 
-        val aboutTextView = findViewById<TextView>(R.id.about)
-        aboutTextView.setOnClickListener {
+        findViewById<TextView>(R.id.about).setOnClickListener {
             startActivity(Intent(this, AboutActivity::class.java))
         }
 
-        val menuIcon = findViewById<ImageView>(R.id.settings)
-        menuIcon.setOnClickListener {
+        findViewById<ImageView>(R.id.settings).setOnClickListener {
             val popupView = layoutInflater.inflate(R.layout.popup_menu, null)
             val popupWindow = PopupWindow(popupView, 400, 400, true)
 
-            val itemConfig = popupView.findViewById<TextView>(R.id.configuration_menu)
-            val itemMelodias = popupView.findViewById<TextView>(R.id.saves_menu)
-            val itemPerfil = popupView.findViewById<TextView>(R.id.profile_menu)
-
-            itemConfig.setOnClickListener {
+            popupView.findViewById<TextView>(R.id.configuration_menu).setOnClickListener {
                 startActivity(Intent(this, Optionsactivity::class.java))
                 popupWindow.dismiss()
             }
 
-            itemMelodias.setOnClickListener {
+            popupView.findViewById<TextView>(R.id.saves_menu).setOnClickListener {
                 startActivity(Intent(this, Savesactivity::class.java))
                 popupWindow.dismiss()
             }
 
-            itemPerfil.setOnClickListener {
+            popupView.findViewById<TextView>(R.id.profile_menu).setOnClickListener {
                 startActivity(Intent(this, profileActivity::class.java))
                 popupWindow.dismiss()
             }
 
             popupWindow.elevation = 10f
-            popupWindow.showAsDropDown(menuIcon, 0, 20)
+            popupWindow.showAsDropDown(findViewById(R.id.settings), 0, 20)
         }
     }
-
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -193,8 +182,7 @@ class bodyActivity : AppCompatActivity() {
             if (resumeAt > 0) mediaPlayer.seekTo(resumeAt)
             if (autoStart) {
                 mediaPlayer.start()
-                val nuevaImagen = imageList[Random.nextInt(imageList.size)]
-                mainImage.setImageResource(nuevaImagen)
+                mainImage.setImageResource(imageList.random())
                 findViewById<ImageButton>(R.id.btnPlayPause).setImageResource(R.drawable.pause)
                 isPlaying = true
             }
@@ -211,7 +199,7 @@ class bodyActivity : AppCompatActivity() {
         runOnUiThread {
             findViewById<ImageButton>(R.id.btnPlayPause).visibility = View.GONE
             spinner.visibility = View.VISIBLE
-            Toast.makeText(this@bodyActivity, "Componiendo melodía ♪♪, por favor espera", Toast.LENGTH_SHORT).show()
+            showToast(R.string.composing_music)
         }
 
         val client = OkHttpClient()
@@ -238,25 +226,18 @@ class bodyActivity : AppCompatActivity() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    Toast.makeText(this@bodyActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
+                showToast(R.string.network_error)
             }
 
             override fun onResponse(call: Call, response: Response) {
                 val bodyStr = response.body?.string()
                 if (!response.isSuccessful || bodyStr.isNullOrEmpty()) {
-                    runOnUiThread {
-                        Toast.makeText(this@bodyActivity, "Error al componer música", Toast.LENGTH_SHORT).show()
-                    }
+                    showToast(R.string.music_error)
                     return
                 }
 
-                val jsonResponse = JSONObject(bodyStr)
-                val taskId = jsonResponse.optString("task_id")
+                val taskId = JSONObject(bodyStr).optString("task_id")
                 if (taskId.isNotEmpty()) {
-                    runOnUiThread {
-                    }
                     consultarEstadoDeTarea(taskId)
                 }
             }
@@ -275,14 +256,11 @@ class bodyActivity : AppCompatActivity() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    Toast.makeText(this@bodyActivity, "Error de red: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
+                showToast(R.string.network_error)
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val bodyStr = response.body?.string()
-                val body = JSONObject(bodyStr ?: "{}")
+                val body = JSONObject(response.body?.string() ?: "{}")
                 val status = body.optString("status", "unknown")
                 val meta = body.optJSONObject("meta")
                 val trackUrl = meta?.optString("track_url") ?: meta?.optString("audio_url")
@@ -291,10 +269,9 @@ class bodyActivity : AppCompatActivity() {
                     "composed" -> {
                         if (!trackUrl.isNullOrEmpty()) {
                             runOnUiThread {
-                                Toast.makeText(this@bodyActivity, "¡Música lista, ue empiece la fiesta! ♪♪", Toast.LENGTH_SHORT).show()
+                                showToast(R.string.music_ready)
                                 findViewById<ImageButton>(R.id.btnPlayPause).visibility = View.VISIBLE
                                 spinner.visibility = View.GONE
-
                                 reproducirDesdeUrl(trackUrl)
                             }
                         } else if (reintentos < 3) {
@@ -302,9 +279,7 @@ class bodyActivity : AppCompatActivity() {
                                 consultarEstadoDeTarea(taskId, reintentos + 1)
                             }, 3000)
                         } else {
-                            runOnUiThread {
-                                Toast.makeText(this@bodyActivity, "No se pudo obtener la pista :(", Toast.LENGTH_LONG).show()
-                            }
+                            showToast(R.string.track_not_found)
                         }
                     }
                     "pending", "in_progress", "composing" -> {
@@ -312,14 +287,28 @@ class bodyActivity : AppCompatActivity() {
                             consultarEstadoDeTarea(taskId, reintentos)
                         }, 5000)
                     }
-                    else -> {
-                        runOnUiThread {
-                            Toast.makeText(this@bodyActivity, "Estado inesperado: $status", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                    else -> showToast(R.string.unexpected_status)
                 }
             }
         })
+    }
+
+    private fun showToast(messageResId: Int) {
+        runOnUiThread {
+            Toast.makeText(this, getString(messageResId), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun aplicarIdiomaGuardado() {
+        val prefs: SharedPreferences = getSharedPreferences("config", Context.MODE_PRIVATE)
+        val idioma = prefs.getString("language", Locale.getDefault().language)
+        val locale = Locale(idioma ?: "en")
+        Locale.setDefault(locale)
+
+        val config = resources.configuration
+        config.setLocale(locale)
+        config.setLayoutDirection(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
     }
 
     private fun hideSystemUI() {
@@ -333,4 +322,3 @@ class bodyActivity : AppCompatActivity() {
                 )
     }
 }
-

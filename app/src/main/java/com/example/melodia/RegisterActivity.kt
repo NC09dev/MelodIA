@@ -1,6 +1,8 @@
 package com.example.melodia
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -8,12 +10,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.firebase.auth.FirebaseAuth
+import java.util.*
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Aplicar el idioma guardado antes de setContentView
+        loadLocale()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.register_activity)
 
@@ -41,25 +47,26 @@ class RegisterActivity : AppCompatActivity() {
             val confirmPassword = passwordAgainEditText.text.toString().trim()
 
             if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(this, "Por favor completa todos los campos", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show()
             } else if (password != confirmPassword) {
-                Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.passwords_do_not_match), Toast.LENGTH_SHORT).show()
             } else {
                 // Crear usuario en Firebase
                 auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-                            Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, getString(R.string.registration_successful), Toast.LENGTH_SHORT).show()
                             val intent = Intent(this, bodyActivity::class.java)
                             startActivity(intent)
                             finish()
                         } else {
-                            Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this, "${getString(R.string.registration_error)}: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                         }
                     }
             }
         }
     }
+
     private fun hideSystemUI() {
         window.decorView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -69,5 +76,22 @@ class RegisterActivity : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
+    }
+
+    // Cargar el idioma guardado en SharedPreferences
+    private fun loadLocale() {
+        val sharedPrefs = getSharedPreferences("Settings", Context.MODE_PRIVATE)
+        val language = sharedPrefs.getString("My_Lang", "es") // idioma por defecto: español
+        setLocale(language)
+    }
+
+    // Cambiar el idioma de la app
+    private fun setLocale(lang: String?) {
+        if (lang == null) return
+        val locale = Locale(lang)
+        Locale.setDefault(locale)
+        val config = Configuration()
+        config.setLocale(locale)
+        baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
     }
 }

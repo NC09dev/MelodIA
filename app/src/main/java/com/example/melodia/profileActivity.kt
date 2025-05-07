@@ -1,14 +1,15 @@
 package com.example.melodia
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.*
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.firebase.auth.FirebaseAuth
+import java.util.*
 
 class profileActivity : AppCompatActivity() {
 
@@ -17,6 +18,13 @@ class profileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.profile_activity)
+
+        // Cargar el idioma guardado desde SharedPreferences
+        val sharedPreferences: SharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
+        val language = sharedPreferences.getString("language", "es") // Por defecto "es" (español)
+
+        // Cambiar idioma según el valor guardado
+        setAppLanguage(language ?: "es")
 
         // Referenciar el TextView "CONTRASEÑA"
         auth = FirebaseAuth.getInstance()
@@ -37,6 +45,17 @@ class profileActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    // Cambiar el idioma de la aplicación
+    private fun setAppLanguage(languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        createConfigurationContext(config)
+        resources.updateConfiguration(config, resources.displayMetrics)
+    }
+
     // Método para ocultar los botones de navegación y la barra de estado
     private fun hideSystemUI() {
         window.decorView.systemUiVisibility = (
@@ -49,6 +68,3 @@ class profileActivity : AppCompatActivity() {
                 )
     }
 }
-
-
-

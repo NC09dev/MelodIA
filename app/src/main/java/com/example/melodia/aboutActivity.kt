@@ -1,6 +1,8 @@
 package com.example.melodia
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -9,9 +11,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import java.util.*
 
 class AboutActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Aplicar idioma antes de cargar la vista
+        loadLocale()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.about_activity)
 
@@ -52,5 +59,22 @@ class AboutActivity : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
+    }
+
+    // Cargar el idioma guardado en SharedPreferences
+    private fun loadLocale() {
+        val sharedPrefs = getSharedPreferences("Settings", Context.MODE_PRIVATE)
+        val language = sharedPrefs.getString("My_Lang", "es") // idioma por defecto: español
+        setLocale(language)
+    }
+
+    // Cambiar el idioma de la app
+    private fun setLocale(lang: String?) {
+        if (lang == null) return
+        val locale = Locale(lang)
+        Locale.setDefault(locale)
+        val config = Configuration()
+        config.setLocale(locale)
+        baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
     }
 }
