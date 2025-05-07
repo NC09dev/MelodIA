@@ -28,7 +28,7 @@
         android:background="@drawable/rounded_rectangle"
         android:fontFamily="@font/baloo"
         android:gravity="center_vertical"
-        android:hint="¿Qué quieres escuchar hoy?"
+        android:hint="@string/hint_que_quieres"
         android:textColorHighlight="#9C27B0"
         android:inputType="text|textNoSuggestions"
         android:scrollHorizontally="true"
@@ -125,7 +125,7 @@
             android:focusable="true"
             android:fontFamily="@font/baloo"
             android:gravity="center"
-            android:text="Sobre la app"
+            android:text="@string/sobre_la_app"
             android:textColor="#D4812A"
             android:textSize="16sp" />
 
@@ -136,7 +136,7 @@
             android:background="@drawable/rounded_rectangle"
             android:fontFamily="@font/baloo"
             android:gravity="center"
-            android:text="Descubrir"
+            android:text="@string/descubrir"
             android:textColor="#D4812A"
             android:textSize="16sp" />
     </LinearLayout>
