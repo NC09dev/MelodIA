@@ -7,6 +7,9 @@ import android.os.*
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.widget.ProgressBar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import okhttp3.*
@@ -24,6 +27,7 @@ class bodyActivity : AppCompatActivity() {
     private var isPlaying = false
     private var currentTrackUrl: String? = null
     private lateinit var mainImage: ImageView
+    private lateinit var spinner: ProgressBar
     private val imageList = listOf(
         R.drawable.design1,
         R.drawable.design2,
@@ -50,6 +54,14 @@ class bodyActivity : AppCompatActivity() {
         seekBar = findViewById(R.id.seekBar)
         mainImage = findViewById(R.id.imageView)
         mainImage.setImageResource(R.drawable.icono) // imagen inicial
+
+        spinner = findViewById(R.id.progressBar)
+        val color = Color.parseColor("#7BEEAF") // El color #7BEEAF
+        spinner.indeterminateTintList = ColorStateList.valueOf(color)
+
+        spinner.visibility = View.GONE
+
+
 
         val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
 
@@ -110,6 +122,8 @@ class bodyActivity : AppCompatActivity() {
         val random_btn = findViewById<TextView>(R.id.random)
 
         random_btn.setOnClickListener{
+            seekBar.visibility = View.VISIBLE
+            playPauseBtn.visibility = View.GONE
             generarMusicaDesdePrompt("random")
         }
 
@@ -195,7 +209,9 @@ class bodyActivity : AppCompatActivity() {
 
     private fun generarMusicaDesdePrompt(prompt: String) {
         runOnUiThread {
-            Toast.makeText(this@bodyActivity, "🔄 Componiendo música, por favor espera...", Toast.LENGTH_SHORT).show()
+            findViewById<ImageButton>(R.id.btnPlayPause).visibility = View.GONE
+            spinner.visibility = View.VISIBLE
+            Toast.makeText(this@bodyActivity, "Componiendo melodía ♪♪, por favor espera", Toast.LENGTH_SHORT).show()
         }
 
         val client = OkHttpClient()
@@ -275,7 +291,10 @@ class bodyActivity : AppCompatActivity() {
                     "composed" -> {
                         if (!trackUrl.isNullOrEmpty()) {
                             runOnUiThread {
-                                Toast.makeText(this@bodyActivity, "¡Música lista!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@bodyActivity, "¡Música lista, ue empiece la fiesta! ♪♪", Toast.LENGTH_SHORT).show()
+                                findViewById<ImageButton>(R.id.btnPlayPause).visibility = View.VISIBLE
+                                spinner.visibility = View.GONE
+
                                 reproducirDesdeUrl(trackUrl)
                             }
                         } else if (reintentos < 3) {
@@ -284,7 +303,7 @@ class bodyActivity : AppCompatActivity() {
                             }, 3000)
                         } else {
                             runOnUiThread {
-                                Toast.makeText(this@bodyActivity, "No se pudo obtener la pista.", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this@bodyActivity, "No se pudo obtener la pista :(", Toast.LENGTH_LONG).show()
                             }
                         }
                     }
@@ -314,3 +333,4 @@ class bodyActivity : AppCompatActivity() {
                 )
     }
 }
+
