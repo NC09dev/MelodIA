@@ -28,7 +28,7 @@
         android:shadowDx="15"
         android:shadowDy="2"
         android:shadowRadius="3"
-        android:text="LISTADO"
+        android:text="@string/listado"
         android:textColor="#F90370"
         android:textSize="32sp"
         app:layout_constraintEnd_toEndOf="parent"
