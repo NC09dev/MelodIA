@@ -2,7 +2,9 @@ package com.example.melodia
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -12,11 +14,15 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import java.util.Locale
+import android.content.res.Configuration
 
 class Optionsactivity : AppCompatActivity() {
 
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(updateLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        loadLocale()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.options_activity)
@@ -30,7 +36,8 @@ class Optionsactivity : AppCompatActivity() {
 
         // Mostrar u ocultar el control de volumen
         volumeButton.setOnClickListener {
-            volumeControl.visibility = if (volumeControl.visibility == View.GONE) View.VISIBLE else View.GONE
+            volumeControl.visibility =
+                if (volumeControl.visibility == View.GONE) View.VISIBLE else View.GONE
         }
 
         // Configurar SeekBar para volumen
@@ -87,25 +94,30 @@ class Optionsactivity : AppCompatActivity() {
             apply()
         }
 
-        setLocale(newLocale)
-
-        // Reiniciar actividad para aplicar idioma
-        val intent = Intent(this, Optionsactivity::class.java)
-        finish()
+        // Reiniciar bodyActivity para aplicar el idioma
+        val intent = Intent(this, bodyActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
+        finish()
     }
 
-    private fun loadLocale() {
-        val sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
-        val language = sharedPreferences.getString("App_Lang", "es") ?: "es"
-        setLocale(language)
-    }
+    private fun updateLocale(context: Context): Context {
+        val prefs: SharedPreferences = context.getSharedPreferences("Settings", Context.MODE_PRIVATE)
+        val language = prefs.getString("App_Lang", "es") ?: "es"
 
-    private fun setLocale(language: String) {
         val locale = Locale(language)
         Locale.setDefault(locale)
-        val config = resources.configuration
+
+        val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
-        baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
+        config.setLayoutDirection(locale)
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            context.createConfigurationContext(config)
+        } else {
+            @Suppress("DEPRECATION")
+            context.resources.updateConfiguration(config, context.resources.displayMetrics)
+            context
+        }
     }
 }

@@ -42,8 +42,10 @@
         <activity android:name=".AboutActivity"
             android:screenOrientation="portrait"/>
 
-        <activity android:name=".bodyActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".bodyActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="locale|layoutDirection|screenSize|orientation"/>
 
         <activity android:name=".Optionsactivity"
             android:screenOrientation="portrait"/>

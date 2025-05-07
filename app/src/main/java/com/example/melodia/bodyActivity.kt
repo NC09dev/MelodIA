@@ -42,7 +42,7 @@ class bodyActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        aplicarIdiomaGuardado()
+        loadLocale()
         setContentView(R.layout.body_activity)
         enableEdgeToEdge()
         hideSystemUI()
@@ -320,18 +320,6 @@ class bodyActivity : AppCompatActivity() {
         }
     }
 
-    private fun aplicarIdiomaGuardado() {
-        val prefs: SharedPreferences = getSharedPreferences("config", Context.MODE_PRIVATE)
-        val idioma = prefs.getString("language", Locale.getDefault().language)
-        val locale = Locale(idioma ?: "en")
-        Locale.setDefault(locale)
-
-        val config = resources.configuration
-        config.setLocale(locale)
-        config.setLayoutDirection(locale)
-        resources.updateConfiguration(config, resources.displayMetrics)
-    }
-
     private fun hideSystemUI() {
         window.decorView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -341,5 +329,21 @@ class bodyActivity : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
+    }
+
+    // Aplicar el idioma desde SharedPreferences
+    private fun loadLocale() {
+        val sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
+        val language = sharedPreferences.getString("App_Lang", "es") ?: "es"
+        setLocale(language)
+    }
+
+    // Establecer el idioma en la configuración
+    private fun setLocale(language: String) {
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
     }
 }

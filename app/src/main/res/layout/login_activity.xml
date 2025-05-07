@@ -47,8 +47,8 @@
 
         <TextView
             android:id="@+id/tvForgotPassword3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="84dp"
+            android:layout_height="30dp"
             android:layout_marginTop="124dp"
             android:layout_marginEnd="176dp"
             android:fontFamily="@font/baloo"
@@ -57,7 +57,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -71,7 +71,7 @@
             android:shadowDx="15"
             android:shadowDy="2"
             android:shadowRadius="3"
-            android:text="Ingresar"
+            android:text="@string/ingresar"
             android:textColor="#F90370"
             android:textSize="36sp"
             android:textStyle="bold"

@@ -8,16 +8,6 @@
     android:background="#7BEEAF"
     tools:context=".MainActivity">
 
-    <!-- Botón de volver -->
-
-    <!-- Título -->
-
-    <!-- Botón IDIOMA -->
-
-    <!-- Botón VOLUMEN -->
-
-    <!-- Imagen inferior (engranajes) -->
-
     <TextView
         android:id="@+id/titleText2"
         android:layout_width="wrap_content"

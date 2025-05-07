@@ -64,14 +64,14 @@ class AboutActivity : AppCompatActivity() {
     // Cargar el idioma guardado en SharedPreferences
     private fun loadLocale() {
         val sharedPrefs = getSharedPreferences("Settings", Context.MODE_PRIVATE)
-        val language = sharedPrefs.getString("My_Lang", "es") // idioma por defecto: español
+        val language = sharedPrefs.getString("App_Lang", "es") // idioma por defecto: español
         setLocale(language)
     }
 
     // Cambiar el idioma de la app
-    private fun setLocale(lang: String?) {
-        if (lang == null) return
-        val locale = Locale(lang)
+    private fun setLocale(language: String?) {
+        if (language == null) return
+        val locale = Locale(language)
         Locale.setDefault(locale)
         val config = Configuration()
         config.setLocale(locale)
