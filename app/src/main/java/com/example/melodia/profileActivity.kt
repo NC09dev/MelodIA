@@ -20,11 +20,18 @@ class profileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.profile_activity)
 
+        val backArrow = findViewById<ImageView>(R.id.backArrow)
+
         // Habilitar bordes sin recortes
         enableEdgeToEdge()
 
         // Ocultar botones de navegación y barra de estado
         hideSystemUI()
+
+        // Flecha de regreso
+        backArrow.setOnClickListener {
+            finish()
+        }
 
         // Cargar el idioma guardado desde SharedPreferences
         val sharedPreferences: SharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)

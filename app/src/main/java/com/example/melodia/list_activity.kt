@@ -19,7 +19,14 @@ class Listactivity : AppCompatActivity() {
         hideSystemUI()
         enableEdgeToEdge()
 
+        val backArrow = findViewById<ImageView>(R.id.backArrow)
+
         mediaPlayer = MediaPlayer()
+
+        // Flecha de regreso
+        backArrow.setOnClickListener {
+            finish()
+        }
 
         val container = findViewById<LinearLayout>(R.id.songsContainer)
         val prefs = getSharedPreferences("saved_songs", MODE_PRIVATE)

@@ -22,9 +22,25 @@
         android:shadowRadius="3"
         android:text="@string/acerca_de"
         android:textColor="#010542"
-        android:textSize="36sp"
+        android:textSize="32sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/backArrow"
+        android:layout_width="40dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:contentDescription="Volver"
+        android:focusable="true"
+        android:src="@drawable/ic_back_arrow"
+        app:layout_constraintEnd_toStartOf="@+id/A_cerca"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -49,21 +65,19 @@
     <TextView
         android:id="@+id/option2"
         android:layout_width="match_parent"
-        android:gravity="center"
         android:layout_height="99dp"
-        android:textSize="24sp"
-        android:text="@string/sobre_nosotros"
-        android:fontFamily="@font/baloo"
-        android:textColor="#FFDF8E"
-        android:layout_marginTop="144dp"
         android:background="#F49194"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/baloo"
+        android:gravity="center"
+        android:text="@string/sobre_nosotros"
+        android:textColor="#FFDF8E"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/A_cerca"
-        android:clickable="true"
-        android:focusable="true"/>
-
+        app:layout_constraintTop_toBottomOf="@+id/option1" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

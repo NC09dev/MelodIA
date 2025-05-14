@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +22,13 @@ class AboutActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.about_activity)
+
+        val backArrow = findViewById<ImageView>(R.id.backArrow)
+
+        // Flecha de regreso
+        backArrow.setOnClickListener {
+            finish()
+        }
 
         // Habilitar bordes sin recortes
         enableEdgeToEdge()

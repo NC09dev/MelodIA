@@ -21,6 +21,9 @@ import java.io.IOException
 import java.util.*
 import android.animation.ValueAnimator
 import androidx.constraintlayout.widget.ConstraintLayout
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+
 
 class bodyActivity : AppCompatActivity() {
 
@@ -180,6 +183,15 @@ class bodyActivity : AppCompatActivity() {
 
             popupView.findViewById<TextView>(R.id.configuration_menu).setOnClickListener {
                 startActivity(Intent(this, Optionsactivity::class.java))
+                if (::mediaPlayer.isInitialized && mediaPlayer.isPlaying) {
+                    mediaPlayer.pause()
+                    mediaPlayer.seekTo(0)
+                    val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
+                    playPauseBtn.setImageResource(R.drawable.play)
+                    isPlaying = false
+                    animateBackgroundColor(layout, playingColor, originalColor)
+
+                }
                 popupWindow.dismiss()
             }
 
@@ -187,12 +199,12 @@ class bodyActivity : AppCompatActivity() {
                 startActivity(Intent(this, Savesactivity::class.java))
 
                 if (::mediaPlayer.isInitialized && mediaPlayer.isPlaying) {
-                    mediaPlayer.stop()
-                    mediaPlayer.release()
-                    mediaPlayer = MediaPlayer()
+                    mediaPlayer.pause()
+                    mediaPlayer.seekTo(0)
                     val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
                     playPauseBtn.setImageResource(R.drawable.play)
                     isPlaying = false
+                    animateBackgroundColor(layout, playingColor, originalColor)
                 }
 
                 popupWindow.dismiss()
@@ -201,6 +213,14 @@ class bodyActivity : AppCompatActivity() {
 
             popupView.findViewById<TextView>(R.id.profile_menu).setOnClickListener {
                 startActivity(Intent(this, profileActivity::class.java))
+                if (::mediaPlayer.isInitialized && mediaPlayer.isPlaying) {
+                    mediaPlayer.pause()
+                    mediaPlayer.seekTo(0)
+                    val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
+                    playPauseBtn.setImageResource(R.drawable.play)
+                    isPlaying = false
+                    animateBackgroundColor(layout, playingColor, originalColor)
+                }
                 popupWindow.dismiss()
             }
 
@@ -249,25 +269,57 @@ class bodyActivity : AppCompatActivity() {
         mediaPlayer.setOnPreparedListener {
             seekBar.max = mediaPlayer.duration
             if (resumeAt > 0) mediaPlayer.seekTo(resumeAt)
+
             if (autoStart) {
                 mediaPlayer.start()
-                mainImage.setImageResource(imageList.random())
-                findViewById<ImageButton>(R.id.btnPlayPause).setImageResource(R.drawable.pause)
                 isPlaying = true
+
+                // ✅ Vibrar al iniciar la canción
+                val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    vibrator.vibrate(150)
+                }
+
+                runOnUiThread {
+                    val layout = findViewById<ConstraintLayout>(R.id.main)
+                    val originalColor = Color.parseColor("#f8b23b")
+                    val playingColor = Color.parseColor("#ff9d6d")
+
+                    val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
+                    playPauseBtn.visibility = View.VISIBLE
+                    playPauseBtn.setImageResource(R.drawable.pause)
+
+                    spinner.visibility = View.GONE
+                    mainImage.setImageResource(imageList.random())
+                    animateBackgroundColor(layout, originalColor, playingColor)
+                }
             }
         }
+
+
         mediaPlayer.setOnCompletionListener {
             seekBar.progress = seekBar.max
-            findViewById<ImageButton>(R.id.btnPlayPause).setImageResource(R.drawable.play)
             isPlaying = false
-            val layout = findViewById<ConstraintLayout>(R.id.main)
-            val originalColor = Color.parseColor("#f8b23b")
-            val playingColor = Color.parseColor("#ff9d6d")
-            animateBackgroundColor(layout, playingColor, originalColor)
+
+            runOnUiThread {
+                val layout = findViewById<ConstraintLayout>(R.id.main)
+                val originalColor = Color.parseColor("#f8b23b")
+                val playingColor = Color.parseColor("#ff9d6d")
+
+                findViewById<ImageButton>(R.id.btnPlayPause).setImageResource(R.drawable.play)
+                animateBackgroundColor(layout, playingColor, originalColor)
+            }
+
             handler.postDelayed({ seekBar.progress = 0 }, 500)
         }
+
         mediaPlayer.prepareAsync()
     }
+
+
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -304,86 +356,127 @@ class bodyActivity : AppCompatActivity() {
 
         val request = Request.Builder()
             .url("https://public-api.beatoven.ai/api/v1/tracks/compose")
-            .addHeader("Authorization", "Bearer ryi47h1881J20pqUP34ArQ")
+            .addHeader("Authorization", "Bearer x1SZHDPKx9LNxL5dNauXyQ")
             .addHeader("Content-Type", "application/json")
             .post(requestBody)
             .build()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                showToast(R.string.network_error)
+                runOnUiThread {
+                    spinner.visibility = View.GONE
+                    showToast(R.string.network_error)
+                }
             }
 
             override fun onResponse(call: Call, response: Response) {
                 val bodyStr = response.body?.string()
+
                 if (!response.isSuccessful || bodyStr.isNullOrEmpty()) {
-                    showToast(R.string.music_error)
+                    runOnUiThread {
+                        spinner.visibility = View.GONE
+                        showToast(R.string.music_error)
+                    }
                     return
                 }
 
                 val taskId = JSONObject(bodyStr).optString("task_id")
                 if (taskId.isNotEmpty()) {
                     consultarEstadoDeTarea(taskId)
+                } else {
+                    runOnUiThread {
+                        spinner.visibility = View.GONE
+                        showToast(R.string.track_not_found)
+                    }
                 }
             }
         })
     }
 
+
+    private var isCheckingTask = false  // Evita múltiples llamadas paralelas
+    private var hasShownWaitToast = false  // Controla si ya se mostró el aviso de espera
+
     private fun consultarEstadoDeTarea(taskId: String, reintentos: Int = 0) {
+        if (isCheckingTask) return
+        isCheckingTask = true
+
+        // Mostrar mensaje si ha pasado mucho tiempo y aún está generando
+        if (reintentos == 3 && !hasShownWaitToast) { // 3 * 5s = 15 segundos aprox.
+            hasShownWaitToast = true
+            runOnUiThread {
+                Toast.makeText(this, "🎶 Esto está tardando un poco... ¡Gracias por esperar!", Toast.LENGTH_LONG).show()
+            }
+        }
+
         val client = OkHttpClient()
         val url = "https://public-api.beatoven.ai/api/v1/tasks/$taskId"
 
         val request = Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer ryi47h1881J20pqUP34ArQ")
+            .addHeader("Authorization", "Bearer x1SZHDPKx9LNxL5dNauXyQ")
             .get()
             .build()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                isCheckingTask = false
+                hasShownWaitToast = false
+                runOnUiThread { spinner.visibility = View.GONE }
                 showToast(R.string.network_error)
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val body = JSONObject(response.body?.string() ?: "{}")
+                val bodyStr = response.body?.string()
+                isCheckingTask = false
+
+                if (bodyStr.isNullOrEmpty()) {
+                    runOnUiThread { spinner.visibility = View.GONE }
+                    showToast(R.string.track_not_found)
+                    return
+                }
+
+                val body = JSONObject(bodyStr)
                 val status = body.optString("status", "unknown")
                 val meta = body.optJSONObject("meta")
                 val trackUrl = meta?.optString("track_url") ?: meta?.optString("audio_url")
 
                 when (status) {
                     "composed" -> {
+                        hasShownWaitToast = false
                         if (!trackUrl.isNullOrEmpty()) {
                             runOnUiThread {
-                                showToast(R.string.music_ready)
-                                findViewById<ImageButton>(R.id.btnPlayPause).visibility = View.VISIBLE
-                                spinner.visibility = View.GONE
-                                val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
-                                playPauseBtn.visibility = View.VISIBLE
-                                val layout = findViewById<ConstraintLayout>(R.id.main)
-                                val originalColor = Color.parseColor("#f8b23b")
-                                val playingColor = Color.parseColor("#ff9d6d")
-                                animateBackgroundColor(layout, originalColor, playingColor)
-
                                 reproducirDesdeUrl(trackUrl)
                             }
-                        } else if (reintentos < 3) {
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                consultarEstadoDeTarea(taskId, reintentos + 1)
-                            }, 3000)
                         } else {
+                            runOnUiThread { spinner.visibility = View.GONE }
                             showToast(R.string.track_not_found)
                         }
                     }
+
                     "pending", "in_progress", "composing" -> {
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            consultarEstadoDeTarea(taskId, reintentos)
-                        }, 5000)
+                        if (reintentos < 10) {
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                consultarEstadoDeTarea(taskId, reintentos + 1)
+                            }, 5000)
+                        } else {
+                            hasShownWaitToast = false
+                            runOnUiThread { spinner.visibility = View.GONE }
+                            showToast(R.string.track_not_found)
+                        }
                     }
-                    else -> showToast(R.string.unexpected_status)
+
+                    else -> {
+                        hasShownWaitToast = false
+                        runOnUiThread { spinner.visibility = View.GONE }
+                        showToast(R.string.unexpected_status)
+                    }
                 }
             }
         })
     }
+
+
 
     private fun showToast(messageResId: Int) {
         runOnUiThread {

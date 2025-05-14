@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -14,28 +15,22 @@ class Savesactivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Cargar el idioma guardado desde SharedPreferences
+        // Cargar idioma desde SharedPreferences
         val sharedPreferences: SharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
-        val language = sharedPreferences.getString("language", "es") // Por defecto "es" (español)
-
-        // Cambiar el idioma según el valor guardado
+        val language = sharedPreferences.getString("language", "es")
         setAppLanguage(language ?: "es")
 
-        // Habilitar bordes sin recortes
         enableEdgeToEdge()
-
         setContentView(R.layout.saves_activity)
-
-        // Ocultar botones de navegación y barra de estado
         hideSystemUI()
+
+        val backArrow = findViewById<ImageView>(R.id.backArrow)
+        backArrow.setOnClickListener { finish() }
 
         findViewById<TextView>(R.id.archivoButton).setOnClickListener {
             startActivity(Intent(this, Listactivity::class.java))
         }
-
-
     }
-
 
     // Cambiar el idioma de la aplicación
     private fun setAppLanguage(languageCode: String) {
