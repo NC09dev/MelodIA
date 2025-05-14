@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.*
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.firebase.auth.FirebaseAuth
 import java.util.*
@@ -18,6 +19,12 @@ class profileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.profile_activity)
+
+        // Habilitar bordes sin recortes
+        enableEdgeToEdge()
+
+        // Ocultar botones de navegación y barra de estado
+        hideSystemUI()
 
         // Cargar el idioma guardado desde SharedPreferences
         val sharedPreferences: SharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
@@ -67,4 +74,5 @@ class profileActivity : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
     }
+
 }

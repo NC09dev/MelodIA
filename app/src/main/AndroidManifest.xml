@@ -55,6 +55,8 @@
 
         <activity android:name=".profileActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".Listactivity"
+            android:screenOrientation="portrait"/>
 
     </application>
 

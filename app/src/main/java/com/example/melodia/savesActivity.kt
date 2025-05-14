@@ -1,9 +1,10 @@
 package com.example.melodia
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
@@ -28,8 +29,13 @@ class Savesactivity : AppCompatActivity() {
         // Ocultar botones de navegación y barra de estado
         hideSystemUI()
 
+        findViewById<TextView>(R.id.archivoButton).setOnClickListener {
+            startActivity(Intent(this, Listactivity::class.java))
+        }
+
 
     }
+
 
     // Cambiar el idioma de la aplicación
     private fun setAppLanguage(languageCode: String) {
@@ -52,4 +58,5 @@ class Savesactivity : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
     }
+
 }

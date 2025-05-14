@@ -31,6 +31,7 @@ class LoginActivity : AppCompatActivity() {
         // Habilitar bordes sin recortes
         enableEdgeToEdge()
 
+
         // Obtener vistas
         val emailEditText = findViewById<EditText>(R.id.etEmail)
         val passwordEditText = findViewById<EditText>(R.id.etPassword)
@@ -102,4 +103,13 @@ class LoginActivity : AppCompatActivity() {
         config.setLocale(locale)
         baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
     }
+
+    override fun onStop() {
+        super.onStop()
+        if (!isChangingConfigurations) {
+            val prefs = getSharedPreferences("saved_songs", MODE_PRIVATE)
+            prefs.edit().clear().apply()
+        }
+    }
+
 }

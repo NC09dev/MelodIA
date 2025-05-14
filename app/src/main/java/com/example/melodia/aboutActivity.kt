@@ -77,4 +77,13 @@ class AboutActivity : AppCompatActivity() {
         config.setLocale(locale)
         baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
     }
+
+    override fun onStop() {
+        super.onStop()
+        if (!isChangingConfigurations) {
+            val prefs = getSharedPreferences("saved_songs", MODE_PRIVATE)
+            prefs.edit().clear().apply()
+        }
+    }
+
 }

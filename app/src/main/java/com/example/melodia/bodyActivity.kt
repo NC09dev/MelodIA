@@ -12,12 +12,15 @@ import android.widget.*
 import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject
 import java.io.IOException
 import java.util.*
+import android.animation.ValueAnimator
+import androidx.constraintlayout.widget.ConstraintLayout
 
 class bodyActivity : AppCompatActivity() {
 
@@ -49,6 +52,10 @@ class bodyActivity : AppCompatActivity() {
 
         handler = Handler(Looper.getMainLooper())
 
+        val layout = findViewById<ConstraintLayout>(R.id.main)
+        val originalColor = Color.parseColor("#f8b23b")
+        val playingColor = Color.parseColor("#ff9d6d")
+
         seekBar = findViewById(R.id.seekBar)
         seekBar.max = 100
         mainImage = findViewById(R.id.imageView)
@@ -59,9 +66,10 @@ class bodyActivity : AppCompatActivity() {
         spinner.visibility = View.GONE
 
         val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
+        playPauseBtn.visibility = View.GONE
+
         mediaPlayer = MediaPlayer()
 
-        // Recupera y aplica el volumen guardado
         val prefs = getSharedPreferences("config", Context.MODE_PRIVATE)
         val savedVolume = prefs.getInt("user_volume", -1)
 
@@ -75,7 +83,7 @@ class bodyActivity : AppCompatActivity() {
                 if (!isUserSeeking && mediaPlayer.isPlaying) {
                     seekBar.progress = mediaPlayer.currentPosition
                 }
-                handler.postDelayed(this, 1000)
+                handler.postDelayed(this, 200)
             }
         }
         handler.post(updateSeekBar)
@@ -93,18 +101,52 @@ class bodyActivity : AppCompatActivity() {
             if (isPlaying) {
                 mediaPlayer.pause()
                 playPauseBtn.setImageResource(R.drawable.play)
+                animateBackgroundColor(layout, playingColor, originalColor)
             } else {
                 mediaPlayer.start()
                 playPauseBtn.setImageResource(R.drawable.pause)
+                animateBackgroundColor(layout, originalColor, playingColor)
             }
             isPlaying = !isPlaying
         }
 
         mediaPlayer.setOnCompletionListener {
             seekBar.progress = seekBar.max
-            playPauseBtn.setImageResource(R.drawable.play)
+            findViewById<ImageButton>(R.id.btnPlayPause).setImageResource(R.drawable.play)
             isPlaying = false
+
             handler.postDelayed({ seekBar.progress = 0 }, 500)
+            animateBackgroundColor(layout, playingColor, originalColor)
+        }
+
+        val heartBtn = findViewById<ImageView>(R.id.heart)
+        heartBtn.setOnClickListener {
+            val heartBtn = findViewById<ImageView>(R.id.heart)
+            heartBtn.setOnClickListener {
+                currentTrackUrl?.let { url ->
+                    val input = EditText(this)
+                    input.hint = "Nombre de la canción"
+
+                    AlertDialog.Builder(this)
+                        .setTitle("Guardar canción")
+                        .setView(input)
+                        .setPositiveButton("Guardar") { _, _ ->
+                            val name = input.text.toString().trim()
+                            if (name.isNotEmpty()) {
+                                val prefs = getSharedPreferences("saved_songs", MODE_PRIVATE)
+                                prefs.edit().putString(name, url).apply()
+                                Toast.makeText(this, "🎵 Canción guardada", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this, "❗ El nombre no puede estar vacío", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        .setNegativeButton("Cancelar", null)
+                        .show()
+                } ?: run {
+                    Toast.makeText(this, "⚠️ No hay canción para guardar", Toast.LENGTH_SHORT).show()
+                }
+            }
+
         }
 
         val promptBtn = findViewById<ImageView>(R.id.prompt)
@@ -143,8 +185,19 @@ class bodyActivity : AppCompatActivity() {
 
             popupView.findViewById<TextView>(R.id.saves_menu).setOnClickListener {
                 startActivity(Intent(this, Savesactivity::class.java))
+
+                if (::mediaPlayer.isInitialized && mediaPlayer.isPlaying) {
+                    mediaPlayer.stop()
+                    mediaPlayer.release()
+                    mediaPlayer = MediaPlayer()
+                    val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
+                    playPauseBtn.setImageResource(R.drawable.play)
+                    isPlaying = false
+                }
+
                 popupWindow.dismiss()
             }
+
 
             popupView.findViewById<TextView>(R.id.profile_menu).setOnClickListener {
                 startActivity(Intent(this, profileActivity::class.java))
@@ -155,6 +208,7 @@ class bodyActivity : AppCompatActivity() {
             popupWindow.showAsDropDown(findViewById(R.id.settings), 0, 20)
         }
     }
+
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -179,6 +233,7 @@ class bodyActivity : AppCompatActivity() {
     private fun reproducirDesdeUrl(audioUrl: String, resumeAt: Int = 0, autoStart: Boolean = true) {
         currentTrackUrl = audioUrl
 
+        // Asegurar reinicio correcto del MediaPlayer
         if (::mediaPlayer.isInitialized) {
             try {
                 mediaPlayer.reset()
@@ -205,6 +260,10 @@ class bodyActivity : AppCompatActivity() {
             seekBar.progress = seekBar.max
             findViewById<ImageButton>(R.id.btnPlayPause).setImageResource(R.drawable.play)
             isPlaying = false
+            val layout = findViewById<ConstraintLayout>(R.id.main)
+            val originalColor = Color.parseColor("#f8b23b")
+            val playingColor = Color.parseColor("#ff9d6d")
+            animateBackgroundColor(layout, playingColor, originalColor)
             handler.postDelayed({ seekBar.progress = 0 }, 500)
         }
         mediaPlayer.prepareAsync()
@@ -214,6 +273,11 @@ class bodyActivity : AppCompatActivity() {
         super.onDestroy()
         handler.removeCallbacksAndMessages(null)
         if (::mediaPlayer.isInitialized) mediaPlayer.release()
+        isPlaying = false
+
+        // Borrar las canciones guardadas
+        val prefs = getSharedPreferences("saved_songs", MODE_PRIVATE)
+        prefs.edit().clear().apply()
     }
 
     private fun generarMusicaDesdePrompt(prompt: String) {
@@ -240,7 +304,7 @@ class bodyActivity : AppCompatActivity() {
 
         val request = Request.Builder()
             .url("https://public-api.beatoven.ai/api/v1/tracks/compose")
-            .addHeader("Authorization", "Bearer LnbcvkbQPBHwSYotbkkE9g")
+            .addHeader("Authorization", "Bearer ryi47h1881J20pqUP34ArQ")
             .addHeader("Content-Type", "application/json")
             .post(requestBody)
             .build()
@@ -271,7 +335,7 @@ class bodyActivity : AppCompatActivity() {
 
         val request = Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer LnbcvkbQPBHwSYotbkkE9g")
+            .addHeader("Authorization", "Bearer ryi47h1881J20pqUP34ArQ")
             .get()
             .build()
 
@@ -293,6 +357,13 @@ class bodyActivity : AppCompatActivity() {
                                 showToast(R.string.music_ready)
                                 findViewById<ImageButton>(R.id.btnPlayPause).visibility = View.VISIBLE
                                 spinner.visibility = View.GONE
+                                val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
+                                playPauseBtn.visibility = View.VISIBLE
+                                val layout = findViewById<ConstraintLayout>(R.id.main)
+                                val originalColor = Color.parseColor("#f8b23b")
+                                val playingColor = Color.parseColor("#ff9d6d")
+                                animateBackgroundColor(layout, originalColor, playingColor)
+
                                 reproducirDesdeUrl(trackUrl)
                             }
                         } else if (reintentos < 3) {
@@ -346,4 +417,14 @@ class bodyActivity : AppCompatActivity() {
         config.setLocale(locale)
         baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
     }
-}
+    private fun animateBackgroundColor(view: View, fromColor: Int, toColor: Int) {
+        val colorAnimation = ValueAnimator.ofArgb(fromColor, toColor)
+        colorAnimation.duration = 1000 // duración de la transición en milisegundos
+        colorAnimation.addUpdateListener { animator ->
+            view.setBackgroundColor(animator.animatedValue as Int)
+        }
+        colorAnimation.start()
+    }
+
+    }
+
