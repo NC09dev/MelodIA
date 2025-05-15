@@ -37,6 +37,9 @@
         <activity android:name=".PasswordActivity"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".ForgotPasswordActivity"
+            android:screenOrientation="portrait"/>
+
         <activity android:name=".RegisterActivity"
             android:screenOrientation="portrait"/>
 
