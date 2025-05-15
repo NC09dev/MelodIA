@@ -65,9 +65,12 @@ class LoginActivity : AppCompatActivity() {
         }
 
         // Listener para "¿Olvidaste tu contraseña?"
-        forgotPasswordText.setOnClickListener {
-            Toast.makeText(this, getString(R.string.redirect_to_recovery), Toast.LENGTH_SHORT).show()
+        val forgotPasswordBtn = findViewById<Button>(R.id.tvForgotPassword)
+        forgotPasswordBtn.setOnClickListener {
+            val intent = Intent(this, ForgotPasswordActivity::class.java)
+            startActivity(intent)
         }
+
 
         // Listener para "Crear cuenta"
         tvRegister.setOnClickListener {
