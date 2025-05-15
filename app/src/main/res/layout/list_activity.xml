@@ -29,7 +29,24 @@
         android:paddingBottom="48dp"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Lista de canciones --><ScrollView
+    <!-- Flecha para volver -->
+
+    <ImageView
+    android:id="@+id/backArrow"
+    android:layout_width="40dp"
+    android:layout_height="42dp"
+    android:layout_marginTop="32dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:contentDescription="Volver"
+    android:focusable="true"
+    android:src="@drawable/ic_back_arrow"
+    app:layout_constraintEnd_toStartOf="@+id/titleText3"
+    app:layout_constraintHorizontal_bias="0.25"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"

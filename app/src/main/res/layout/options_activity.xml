@@ -6,22 +6,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FF9FAA"
-    tools:context=".options_activity">
+    tools:context=".Optionsactivity">
 
     <!-- Flecha para volver -->
+
     <ImageView
         android:id="@+id/backArrow"
-        android:layout_width="55dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="42dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
+        android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:contentDescription="Volver"
         android:focusable="true"
         android:src="@drawable/ic_back_arrow"
-        android:background="?android:attr/selectableItemBackground"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/titleText"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/titleText"

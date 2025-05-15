@@ -23,9 +23,16 @@ class Listactivity : AppCompatActivity() {
         hideSystemUI()
         enableEdgeToEdge()
 
+        val backArrow = findViewById<ImageView>(R.id.backArrow)
+
         mediaPlayer = MediaPlayer()
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
+
+        // Flecha de regreso
+        backArrow.setOnClickListener {
+            finish()
+        }
 
         val container = findViewById<LinearLayout>(R.id.songsContainer)
         val colors = listOf("#F90370", "#F5D225", "#F49194")
