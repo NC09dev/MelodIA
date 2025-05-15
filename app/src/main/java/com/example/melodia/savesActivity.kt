@@ -30,6 +30,12 @@ class Savesactivity : AppCompatActivity() {
         findViewById<TextView>(R.id.archivoButton).setOnClickListener {
             startActivity(Intent(this, Listactivity::class.java))
         }
+
+        findViewById<TextView>(R.id.exportarButton).setOnClickListener {
+            startActivity(Intent(this, exportActivity::class.java))
+        }
+
+
     }
 
     // Cambiar el idioma de la aplicación

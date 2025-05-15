@@ -5,7 +5,7 @@
     android:id="@+id/songLayout"
     android:layout_width="match_parent"
     android:layout_height="99dp"
-    android:padding="10dp"
+    android:padding="30dp"
     android:background="#FFFFFF">
 
     <TextView
@@ -17,33 +17,21 @@
         android:text="Nombre de la canción"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/playButton"
+        app:layout_constraintEnd_toStartOf="@+id/downloadButton"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.482" />
 
     <ImageView
-        android:id="@+id/playButton"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="20dp"
-        android:src="@drawable/play"
+        android:id="@+id/downloadButton"
+        android:layout_width="36dp"
+        android:layout_height="34dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/spinner_custom"
+        android:src="@drawable/download_icon"
         app:layout_constraintBottom_toBottomOf="@+id/songName"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <ImageView
-        android:id="@+id/deleteButton"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:background="@drawable/spinner_custom"
-        android:src="@drawable/delete_icon"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.953"
-        app:layout_constraintStart_toStartOf="@+id/songName"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

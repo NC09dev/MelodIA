@@ -1,32 +1,26 @@
 package com.example.melodia
 
+import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.media.AudioManager
-import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.SeekBar
-import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import java.util.Locale
-import android.content.res.Configuration
+import java.util.*
 
 class Optionsactivity : AppCompatActivity() {
 
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(updateLocale(newBase))
-    }
+    private lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.options_activity)
         hideSystemUI()
+
+        prefs = getSharedPreferences("config", Context.MODE_PRIVATE)
 
         val volumeButton = findViewById<TextView>(R.id.volumeButton)
         val volumeControl = findViewById<LinearLayout>(R.id.volumeControl)
@@ -34,27 +28,16 @@ class Optionsactivity : AppCompatActivity() {
         val languageButton = findViewById<TextView>(R.id.languajeButton)
         val backArrow = findViewById<ImageView>(R.id.backArrow)
 
-        // Mostrar u ocultar el control de volumen
-        volumeButton.setOnClickListener {
-            volumeControl.visibility =
-                if (volumeControl.visibility == View.GONE) View.VISIBLE else View.GONE
-        }
-
-        // Configurar SeekBar para volumen
+        // Control de volumen
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-
         seekBar.max = maxVolume
         seekBar.progress = currentVolume
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                // Aplicar el volumen al sistema
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
-
-                // Guardar el valor en SharedPreferences
-                val prefs = getSharedPreferences("config", Context.MODE_PRIVATE)
                 prefs.edit().putInt("user_volume", progress).apply()
             }
 
@@ -62,15 +45,63 @@ class Optionsactivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // Botón de cambiar idioma
-        languageButton.setOnClickListener {
-            toggleLanguage()
+        // Mostrar u ocultar volumen
+        volumeButton.setOnClickListener {
+            volumeControl.visibility =
+                if (volumeControl.visibility == View.GONE) View.VISIBLE else View.GONE
         }
 
-        // Flecha de regreso
+        // Mostrar popup de idioma
+        languageButton.setOnClickListener {
+            showLanguagePopup()
+        }
+
+        // Volver
         backArrow.setOnClickListener {
             finish()
         }
+    }
+
+    private fun showLanguagePopup() {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.popup_language, null)
+        val leftArrow = dialogView.findViewById<ImageView>(R.id.left_arrow)
+        val rightArrow = dialogView.findViewById<ImageView>(R.id.right_arrow)
+        val languageText = dialogView.findViewById<TextView>(R.id.language_selected)
+
+        // Obtener idioma actual desde SharedPreferences
+        val currentLang = prefs.getString("language", "es") ?: "es"
+        languageText.text = if (currentLang == "es") "ESPAÑOL" else "ENGLISH"
+
+        // Declarar alertDialog antes de usarlo
+        val alertDialog = AlertDialog.Builder(this).setView(dialogView).create()
+
+        // Función para alternar idioma
+        fun toggleLanguage() {
+            val newLang = if (languageText.text == "ESPAÑOL") "en" else "es"
+            changeAppLanguage(newLang)
+            alertDialog.dismiss()
+        }
+
+        // Asignar clics a ambas flechas
+        leftArrow.setOnClickListener { toggleLanguage() }
+        rightArrow.setOnClickListener { toggleLanguage() }
+
+        alertDialog.show()
+    }
+
+    private fun changeAppLanguage(languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        config.setLayoutDirection(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+
+        // Guardar idioma en preferencias
+        prefs.edit().putString("language", languageCode).apply()
+
+        // Reiniciar actividad para aplicar idioma
+        recreate()
     }
 
     private fun hideSystemUI() {
@@ -83,42 +114,4 @@ class Optionsactivity : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
     }
-
-    private fun toggleLanguage() {
-        val currentLocale = resources.configuration.locales[0].language
-        val newLocale = if (currentLocale == "es") "en" else "es"
-
-        val sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
-        with(sharedPreferences.edit()) {
-            putString("App_Lang", newLocale)
-            apply()
-        }
-
-        // Reiniciar bodyActivity para aplicar el idioma
-        val intent = Intent(this, bodyActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
-        finish()
-    }
-
-    private fun updateLocale(context: Context): Context {
-        val prefs: SharedPreferences = context.getSharedPreferences("Settings", Context.MODE_PRIVATE)
-        val language = prefs.getString("App_Lang", "es") ?: "es"
-
-        val locale = Locale(language)
-        Locale.setDefault(locale)
-
-        val config = Configuration(context.resources.configuration)
-        config.setLocale(locale)
-        config.setLayoutDirection(locale)
-
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.createConfigurationContext(config)
-        } else {
-            @Suppress("DEPRECATION")
-            context.resources.updateConfiguration(config, context.resources.displayMetrics)
-            context
-        }
-    }
-
 }

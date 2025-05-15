@@ -58,6 +58,11 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".Listactivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".exportActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".ForgotPasswordActivity"
+            android:screenOrientation="portrait"/>
 
     </application>
 

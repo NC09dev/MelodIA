@@ -23,6 +23,8 @@ import android.animation.ValueAnimator
 import androidx.constraintlayout.widget.ConstraintLayout
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 class bodyActivity : AppCompatActivity() {
@@ -124,32 +126,47 @@ class bodyActivity : AppCompatActivity() {
 
         val heartBtn = findViewById<ImageView>(R.id.heart)
         heartBtn.setOnClickListener {
-            val heartBtn = findViewById<ImageView>(R.id.heart)
-            heartBtn.setOnClickListener {
-                currentTrackUrl?.let { url ->
-                    val input = EditText(this)
-                    input.hint = "Nombre de la canción"
+            currentTrackUrl?.let { url ->
+                val input = EditText(this)
+                input.hint = "Nombre de la canción"
 
-                    AlertDialog.Builder(this)
-                        .setTitle("Guardar canción")
-                        .setView(input)
-                        .setPositiveButton("Guardar") { _, _ ->
-                            val name = input.text.toString().trim()
-                            if (name.isNotEmpty()) {
-                                val prefs = getSharedPreferences("saved_songs", MODE_PRIVATE)
-                                prefs.edit().putString(name, url).apply()
-                                Toast.makeText(this, "🎵 Canción guardada", Toast.LENGTH_SHORT).show()
+                AlertDialog.Builder(this)
+                    .setTitle("Guardar canción")
+                    .setView(input)
+                    .setPositiveButton("Guardar") { _, _ ->
+                        val name = input.text.toString().trim()
+                        if (name.isNotEmpty()) {
+                            val db = FirebaseFirestore.getInstance()
+                            val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+                            if (userId != null) {
+                                val songData = hashMapOf(
+                                    "title" to name,
+                                    "url" to url,
+                                    "timestamp" to System.currentTimeMillis()
+                                )
+                                db.collection("users")
+                                    .document(userId)
+                                    .collection("songs")
+                                    .add(songData)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(this, "🎵 Canción guardada en la nube", Toast.LENGTH_SHORT).show()
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(this, "❗ Error al guardar en Firebase", Toast.LENGTH_SHORT).show()
+                                    }
                             } else {
-                                Toast.makeText(this, "❗ El nombre no puede estar vacío", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "❗ Usuario no autenticado", Toast.LENGTH_SHORT).show()
                             }
+                        } else {
+                            Toast.makeText(this, "❗ El nombre no puede estar vacío", Toast.LENGTH_SHORT).show()
                         }
-                        .setNegativeButton("Cancelar", null)
-                        .show()
-                } ?: run {
-                    Toast.makeText(this, "⚠️ No hay canción para guardar", Toast.LENGTH_SHORT).show()
-                }
+                    }
+                    .setNegativeButton("Cancelar", null)
+                    .show()
+            } ?: run {
+                Toast.makeText(this, "⚠️ No hay canción para guardar", Toast.LENGTH_SHORT).show()
             }
-
         }
 
         val promptBtn = findViewById<ImageView>(R.id.prompt)
@@ -274,14 +291,6 @@ class bodyActivity : AppCompatActivity() {
                 mediaPlayer.start()
                 isPlaying = true
 
-                // ✅ Vibrar al iniciar la canción
-                val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE))
-                } else {
-                    vibrator.vibrate(150)
-                }
-
                 runOnUiThread {
                     val layout = findViewById<ConstraintLayout>(R.id.main)
                     val originalColor = Color.parseColor("#f8b23b")
@@ -394,15 +403,12 @@ class bodyActivity : AppCompatActivity() {
     }
 
 
-    private var isCheckingTask = false  // Evita múltiples llamadas paralelas
-    private var hasShownWaitToast = false  // Controla si ya se mostró el aviso de espera
+    private var isCheckingTask = false
+    private var hasShownWaitToast = false
 
     private fun consultarEstadoDeTarea(taskId: String, reintentos: Int = 0) {
-        if (isCheckingTask) return
-        isCheckingTask = true
-
         // Mostrar mensaje si ha pasado mucho tiempo y aún está generando
-        if (reintentos == 3 && !hasShownWaitToast) { // 3 * 5s = 15 segundos aprox.
+        if (reintentos == 3 && !hasShownWaitToast) {
             hasShownWaitToast = true
             runOnUiThread {
                 Toast.makeText(this, "🎶 Esto está tardando un poco... ¡Gracias por esperar!", Toast.LENGTH_LONG).show()
@@ -420,19 +426,24 @@ class bodyActivity : AppCompatActivity() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    spinner.visibility = View.GONE
+                    showToast(R.string.network_error)
+                }
                 isCheckingTask = false
                 hasShownWaitToast = false
-                runOnUiThread { spinner.visibility = View.GONE }
-                showToast(R.string.network_error)
             }
 
             override fun onResponse(call: Call, response: Response) {
                 val bodyStr = response.body?.string()
-                isCheckingTask = false
 
                 if (bodyStr.isNullOrEmpty()) {
-                    runOnUiThread { spinner.visibility = View.GONE }
-                    showToast(R.string.track_not_found)
+                    runOnUiThread {
+                        spinner.visibility = View.GONE
+                        showToast(R.string.track_not_found)
+                    }
+                    isCheckingTask = false
+                    hasShownWaitToast = false
                     return
                 }
 
@@ -443,14 +454,18 @@ class bodyActivity : AppCompatActivity() {
 
                 when (status) {
                     "composed" -> {
+                        isCheckingTask = false
                         hasShownWaitToast = false
                         if (!trackUrl.isNullOrEmpty()) {
                             runOnUiThread {
                                 reproducirDesdeUrl(trackUrl)
+                                showToast(R.string.music_ready)
                             }
                         } else {
-                            runOnUiThread { spinner.visibility = View.GONE }
-                            showToast(R.string.track_not_found)
+                            runOnUiThread {
+                                spinner.visibility = View.GONE
+                                showToast(R.string.track_not_found)
+                            }
                         }
                     }
 
@@ -460,21 +475,27 @@ class bodyActivity : AppCompatActivity() {
                                 consultarEstadoDeTarea(taskId, reintentos + 1)
                             }, 5000)
                         } else {
+                            runOnUiThread {
+                                spinner.visibility = View.GONE
+                                showToast(R.string.track_not_found)
+                            }
                             hasShownWaitToast = false
-                            runOnUiThread { spinner.visibility = View.GONE }
-                            showToast(R.string.track_not_found)
                         }
                     }
 
                     else -> {
+                        isCheckingTask = false
                         hasShownWaitToast = false
-                        runOnUiThread { spinner.visibility = View.GONE }
-                        showToast(R.string.unexpected_status)
+                        runOnUiThread {
+                            spinner.visibility = View.GONE
+                            showToast(R.string.unexpected_status)
+                        }
                     }
                 }
             }
         })
     }
+
 
 
 

@@ -1,6 +1,7 @@
 package com.example.melodia
 
 import android.animation.ValueAnimator
+import android.app.DownloadManager
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
@@ -12,8 +13,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.activity.enableEdgeToEdge
 import java.util.Locale
+import android.content.Context
 
-class Listactivity : AppCompatActivity() {
+class exportActivity : AppCompatActivity() {
 
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var db: FirebaseFirestore
@@ -24,17 +26,12 @@ class Listactivity : AppCompatActivity() {
         setContentView(R.layout.list_activity)
         hideSystemUI()
         enableEdgeToEdge()
-        loadLocale()
+
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
         val backArrow = findViewById<ImageView>(R.id.backArrow)
-
-        mediaPlayer = MediaPlayer()
-        db = FirebaseFirestore.getInstance()
-        auth = FirebaseAuth.getInstance()
-
-        backArrow.setOnClickListener {
-            finish()
-        }
+        backArrow.setOnClickListener { finish() }
 
         val container = findViewById<LinearLayout>(R.id.songsContainer)
 
@@ -46,7 +43,6 @@ class Listactivity : AppCompatActivity() {
         )
 
         val userId = auth.currentUser?.uid
-
         if (userId == null) {
             Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
             return
@@ -62,40 +58,41 @@ class Listactivity : AppCompatActivity() {
                     val songName = document.getString("title") ?: "Sin título"
                     val songUrl = document.getString("url") ?: ""
 
-                    val item = layoutInflater.inflate(R.layout.item_song, container, false)
-
+                    val item = layoutInflater.inflate(R.layout.export_song, container, false)
                     val nameText = item.findViewById<TextView>(R.id.songName)
-                    val playBtn = item.findViewById<ImageView>(R.id.playButton)
-                    val deleteBtn = item.findViewById<ImageView>(R.id.deleteButton)
+                    val downloadBtn = item.findViewById<ImageView>(R.id.downloadButton)
                     val layout = item.findViewById<ConstraintLayout>(R.id.songLayout)
 
-                    // Asignar fondo y texto combinados
-                    val (bgColor, textColor) = colorPairs.entries.random()
-                    layout.setBackgroundColor(Color.parseColor(bgColor))
+                    // Aplicar color de fondo y color de texto combinados
+                    val (backgroundColor, textColor) = colorPairs.entries.random()
+                    layout.setBackgroundColor(Color.parseColor(backgroundColor))
                     nameText.setTextColor(Color.parseColor(textColor))
                     nameText.text = songName
 
-                    playBtn.setOnClickListener {
+                    downloadBtn.setOnClickListener {
                         if (songUrl.isNotEmpty()) {
-                            reproducirDesdeUrl(songUrl)
+                            try {
+                                val request = DownloadManager.Request(android.net.Uri.parse(songUrl))
+                                    .setTitle("Descargando canción")
+                                    .setDescription("Guardando $songName.mp3")
+                                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                                    .setDestinationInExternalPublicDir(
+                                        android.os.Environment.DIRECTORY_DOWNLOADS,
+                                        "$songName.mp3"
+                                    )
+                                    .setAllowedOverMetered(true)
+                                    .setAllowedOverRoaming(true)
+
+                                val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                                downloadManager.enqueue(request)
+
+                                Toast.makeText(this, "🎶 Descargando \"$songName\"", Toast.LENGTH_SHORT).show()
+                            } catch (e: Exception) {
+                                Toast.makeText(this, "❌ Error al iniciar descarga: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
                         } else {
                             Toast.makeText(this, "URL no válida para esta canción", Toast.LENGTH_SHORT).show()
                         }
-                    }
-
-                    deleteBtn.setOnClickListener {
-                        db.collection("users")
-                            .document(userId)
-                            .collection("songs")
-                            .document(songId)
-                            .delete()
-                            .addOnSuccessListener {
-                                Toast.makeText(this, "🎵 Canción eliminada", Toast.LENGTH_SHORT).show()
-                                container.removeView(item)
-                            }
-                            .addOnFailureListener { e ->
-                                Toast.makeText(this, "❌ Error al eliminar: ${e.message}", Toast.LENGTH_SHORT).show()
-                            }
                     }
 
                     container.addView(item)
@@ -104,28 +101,6 @@ class Listactivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error al cargar canciones: ${e.message}", Toast.LENGTH_LONG).show()
             }
-    }
-
-    private fun reproducirDesdeUrl(audioUrl: String) {
-        try {
-            if (::mediaPlayer.isInitialized) {
-                mediaPlayer.reset()
-            } else {
-                mediaPlayer = MediaPlayer()
-            }
-
-            mediaPlayer.setDataSource(audioUrl)
-            mediaPlayer.setOnPreparedListener {
-                mediaPlayer.start()
-                Toast.makeText(this, "🎵 Reproduciendo canción", Toast.LENGTH_SHORT).show()
-            }
-            mediaPlayer.setOnCompletionListener {
-                Toast.makeText(this, "✅ Reproducción terminada", Toast.LENGTH_SHORT).show()
-            }
-            mediaPlayer.prepareAsync()
-        } catch (e: Exception) {
-            Toast.makeText(this, "❌ Error: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun hideSystemUI() {
@@ -144,6 +119,7 @@ class Listactivity : AppCompatActivity() {
         if (::mediaPlayer.isInitialized) mediaPlayer.release()
     }
 
+    // --- Cambio de idioma ---
     private fun loadLocale() {
         val sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
         val language = sharedPreferences.getString("App_Lang", "es") ?: "es"
@@ -157,5 +133,4 @@ class Listactivity : AppCompatActivity() {
         config.setLocale(locale)
         baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
     }
-
 }
