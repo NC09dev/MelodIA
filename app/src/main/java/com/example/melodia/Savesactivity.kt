@@ -1,7 +1,6 @@
 package com.example.melodia
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -15,11 +14,6 @@ class Savesactivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Cargar idioma desde SharedPreferences
-        val sharedPreferences: SharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
-        val language = sharedPreferences.getString("language", "es")
-        setAppLanguage(language ?: "es")
 
         enableEdgeToEdge()
         setContentView(R.layout.saves_activity)
@@ -39,14 +33,20 @@ class Savesactivity : AppCompatActivity() {
 
     }
 
-    // Cambiar el idioma de la aplicación
-    private fun setAppLanguage(languageCode: String) {
-        val locale = Locale(languageCode)
+    // Cargar idioma guardado en SharedPreferences "config"
+    private fun loadLocale() {
+        val sharedPreferences = getSharedPreferences("config", MODE_PRIVATE)
+        val language = sharedPreferences.getString("language", "es") ?: "es"
+        setLocale(language)
+    }
+
+    // Aplicar el idioma a la configuración
+    private fun setLocale(language: String) {
+        val locale = Locale(language)
         Locale.setDefault(locale)
         val config = resources.configuration
         config.setLocale(locale)
-        createConfigurationContext(config)
-        resources.updateConfiguration(config, resources.displayMetrics)
+        baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
     }
 
     // Método para ocultar los botones de navegación y la barra de estado

@@ -6,6 +6,7 @@ import android.widget.*
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import java.util.Locale
 
 class ForgotPasswordActivity : AppCompatActivity() {
 
@@ -59,5 +60,20 @@ class ForgotPasswordActivity : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
+    }
+    // Cargar idioma guardado en SharedPreferences "config"
+    private fun loadLocale() {
+        val sharedPreferences = getSharedPreferences("config", MODE_PRIVATE)
+        val language = sharedPreferences.getString("language", "es") ?: "es"
+        setLocale(language)
+    }
+
+    // Aplicar el idioma a la configuración
+    private fun setLocale(language: String) {
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
     }
 }

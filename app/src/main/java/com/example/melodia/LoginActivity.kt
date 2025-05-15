@@ -8,13 +8,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.firebase.auth.FirebaseAuth
-import java.util.Locale
+import java.util.*
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //  Cargar idioma antes de crear la vista
+        // Cargar idioma antes de inflar la vista
         loadLocale()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_activity)
@@ -30,7 +30,6 @@ class LoginActivity : AppCompatActivity() {
 
         // Habilitar bordes sin recortes
         enableEdgeToEdge()
-
 
         // Obtener vistas
         val emailEditText = findViewById<EditText>(R.id.etEmail)
@@ -71,7 +70,6 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
         // Listener para "Crear cuenta"
         tvRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
@@ -91,10 +89,10 @@ class LoginActivity : AppCompatActivity() {
                 )
     }
 
-    // Cargar idioma guardado en SharedPreferences
+    // Cargar idioma guardado en SharedPreferences "config"
     private fun loadLocale() {
-        val sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
-        val language = sharedPreferences.getString("App_Lang", "es") ?: "es"
+        val sharedPreferences = getSharedPreferences("config", MODE_PRIVATE)
+        val language = sharedPreferences.getString("language", "es") ?: "es"
         setLocale(language)
     }
 
@@ -114,5 +112,4 @@ class LoginActivity : AppCompatActivity() {
             prefs.edit().clear().apply()
         }
     }
-
 }

@@ -42,4 +42,8 @@
     <string name="unexpected_status">ESTADO INESPERADO: %1$s</string>
     <string name="error_message">ERROR: %1$s</string>
     <string name="language2">ESPAÑOL</string>
+    <string name="recuperarcontra">RECUPERAR COTRASEÑA</string>
+    <string name="enviocorreo">ENVIAR CORREO</string>
+    <string name="volverallogin">VOLVER AL LOGIN</string>
+    <string name="delay">🎶 ESTO ESTÁ TARDANDO UN POCO... ¡GRACIAS POR ESPERAR!</string>
 </resources>

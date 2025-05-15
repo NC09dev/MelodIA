@@ -73,26 +73,40 @@ class exportActivity : AppCompatActivity() {
                     downloadBtn.setOnClickListener {
                         if (songUrl.isNotEmpty()) {
                             try {
-                                val request = DownloadManager.Request(android.net.Uri.parse(songUrl))
-                                    .setTitle("Descargando canción")
-                                    .setDescription("Guardando $songName.mp3")
-                                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                                    .setDestinationInExternalPublicDir(
-                                        android.os.Environment.DIRECTORY_DOWNLOADS,
-                                        "$songName.mp3"
-                                    )
-                                    .setAllowedOverMetered(true)
-                                    .setAllowedOverRoaming(true)
+                                val request =
+                                    DownloadManager.Request(android.net.Uri.parse(songUrl))
+                                        .setTitle("Descargando canción")
+                                        .setDescription("Guardando $songName.mp3")
+                                        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                                        .setDestinationInExternalPublicDir(
+                                            android.os.Environment.DIRECTORY_DOWNLOADS,
+                                            "$songName.mp3"
+                                        )
+                                        .setAllowedOverMetered(true)
+                                        .setAllowedOverRoaming(true)
 
-                                val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                                val downloadManager =
+                                    getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                                 downloadManager.enqueue(request)
 
-                                Toast.makeText(this, "🎶 Descargando \"$songName\"", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    this,
+                                    "🎶 Descargando \"$songName\"",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             } catch (e: Exception) {
-                                Toast.makeText(this, "❌ Error al iniciar descarga: ${e.message}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    this,
+                                    "❌ Error al iniciar descarga: ${e.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         } else {
-                            Toast.makeText(this, "URL no válida para esta canción", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this,
+                                "URL no válida para esta canción",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
 
@@ -100,7 +114,8 @@ class exportActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al cargar canciones: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Error al cargar canciones: ${e.message}", Toast.LENGTH_LONG)
+                    .show()
             }
     }
 
@@ -120,13 +135,14 @@ class exportActivity : AppCompatActivity() {
         if (::mediaPlayer.isInitialized) mediaPlayer.release()
     }
 
-    // --- Cambio de idioma ---
+    // Cargar idioma guardado en SharedPreferences "config"
     private fun loadLocale() {
-        val sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
-        val language = sharedPreferences.getString("App_Lang", "es") ?: "es"
+        val sharedPreferences = getSharedPreferences("config", MODE_PRIVATE)
+        val language = sharedPreferences.getString("language", "es") ?: "es"
         setLocale(language)
     }
 
+    // Aplicar el idioma a la configuración
     private fun setLocale(language: String) {
         val locale = Locale(language)
         Locale.setDefault(locale)

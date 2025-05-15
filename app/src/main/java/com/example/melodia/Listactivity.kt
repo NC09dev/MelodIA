@@ -1,6 +1,5 @@
 package com.example.melodia
 
-import android.animation.ValueAnimator
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
@@ -145,12 +144,14 @@ class Listactivity : AppCompatActivity() {
         if (::mediaPlayer.isInitialized) mediaPlayer.release()
     }
 
+    // Cargar idioma guardado en SharedPreferences "config"
     private fun loadLocale() {
-        val sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
-        val language = sharedPreferences.getString("App_Lang", "es") ?: "es"
+        val sharedPreferences = getSharedPreferences("config", MODE_PRIVATE)
+        val language = sharedPreferences.getString("language", "es") ?: "es"
         setLocale(language)
     }
 
+    // Aplicar el idioma a la configuración
     private fun setLocale(language: String) {
         val locale = Locale(language)
         Locale.setDefault(locale)

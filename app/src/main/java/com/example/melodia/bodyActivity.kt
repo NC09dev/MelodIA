@@ -412,7 +412,7 @@ class bodyActivity : AppCompatActivity() {
         if (reintentos == 3 && !hasShownWaitToast) {
             hasShownWaitToast = true
             runOnUiThread {
-                Toast.makeText(this, "🎶 Esto está tardando un poco... ¡Gracias por esperar!", Toast.LENGTH_LONG).show()
+                showToast(R.string.delay)
             }
         }
 
@@ -519,8 +519,8 @@ class bodyActivity : AppCompatActivity() {
 
     // Aplicar el idioma desde SharedPreferences
     private fun loadLocale() {
-        val sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
-        val language = sharedPreferences.getString("App_Lang", "es") ?: "es"
+        val prefs = getSharedPreferences("config", MODE_PRIVATE)
+        val language = prefs.getString("language", "es") ?: "es"
         setLocale(language)
     }
 

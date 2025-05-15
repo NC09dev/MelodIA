@@ -61,10 +61,10 @@ class PasswordActivity : AppCompatActivity() {
         }
     }
 
-    // Cargar idioma guardado en SharedPreferences
+    // Cargar idioma guardado en SharedPreferences "config"
     private fun loadLocale() {
-        val sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
-        val language = sharedPreferences.getString("App_Lang", "es") ?: "es"
+        val sharedPreferences = getSharedPreferences("config", MODE_PRIVATE)
+        val language = sharedPreferences.getString("language", "es") ?: "es"
         setLocale(language)
     }
 

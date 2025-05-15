@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.*
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatDelegate
 import com.google.firebase.auth.FirebaseAuth
 import java.util.*
 
@@ -17,6 +16,9 @@ class profileActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Aplicar idioma antes de inflar el layout
+        loadLocale()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.profile_activity)
 
@@ -32,13 +34,6 @@ class profileActivity : AppCompatActivity() {
         backArrow.setOnClickListener {
             finish()
         }
-
-        // Cargar el idioma guardado desde SharedPreferences
-        val sharedPreferences: SharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
-        val language = sharedPreferences.getString("language", "es") // Por defecto "es" (español)
-
-        // Cambiar idioma según el valor guardado
-        setAppLanguage(language ?: "es")
 
         // Referenciar el TextView "CONTRASEÑA"
         auth = FirebaseAuth.getInstance()
@@ -60,17 +55,23 @@ class profileActivity : AppCompatActivity() {
         }
     }
 
-    // Cambiar el idioma de la aplicación
+    // Cargar idioma desde SharedPreferences
+    private fun loadLocale() {
+        val prefs = getSharedPreferences("config", MODE_PRIVATE)
+        val language = prefs.getString("language", "es") ?: "es"
+        setAppLanguage(language)
+    }
+
+    // Establecer idioma en la configuración
     private fun setAppLanguage(languageCode: String) {
         val locale = Locale(languageCode)
         Locale.setDefault(locale)
         val config = resources.configuration
         config.setLocale(locale)
-        createConfigurationContext(config)
-        resources.updateConfiguration(config, resources.displayMetrics)
+        baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
     }
 
-    // Método para ocultar los botones de navegación y la barra de estado
+    // Ocultar navegación y barra de estado
     private fun hideSystemUI() {
         window.decorView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -81,5 +82,4 @@ class profileActivity : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
     }
-
 }

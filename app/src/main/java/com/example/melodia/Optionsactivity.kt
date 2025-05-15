@@ -10,6 +10,8 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
+import android.content.Intent
+
 
 class Optionsactivity : AppCompatActivity() {
 
@@ -76,12 +78,22 @@ class Optionsactivity : AppCompatActivity() {
         // Declarar alertDialog antes de usarlo
         val alertDialog = AlertDialog.Builder(this).setView(dialogView).create()
 
-        // Función para alternar idioma
-        fun toggleLanguage() {
-            val newLang = if (languageText.text == "ESPAÑOL") "en" else "es"
-            changeAppLanguage(newLang)
-            alertDialog.dismiss()
-        }
+            // Función para alternar idioma
+            fun toggleLanguage() {
+                val newLang = if (languageText.text == "ESPAÑOL") "en" else "es"
+
+                // Guardar en preferencias
+                prefs.edit().putString("language", newLang).apply()
+
+                // Crear intent para reiniciar la app desde bodyActivity
+                val intent = Intent(this@Optionsactivity, bodyActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+
+                // Cerrar el popup y esta actividad
+                alertDialog.dismiss()
+                finish()
+            }
 
         // Asignar clics a ambas flechas
         leftArrow.setOnClickListener { toggleLanguage() }

@@ -41,4 +41,9 @@
     <string name="network_error">NETWORK ERROR: %1$s</string>
     <string name="unexpected_status">UNEXPECTED STATUS: %1$s</string>
     <string name="error_message">ERROR: %1$s</string>
+    <string name="language2">ENGLISH</string>
+    <string name="recuperarcontra">RECOVER PASSWORD</string>
+    <string name="enviocorreo">SEND EMAIL</string>
+    <string name="volverallogin">BACK TO THE LOGIN</string>
+    <string name="delay">🎶 THIS IS TAKING A WHILE... THANK YOU FOR WAITING!</string>
 </resources>
