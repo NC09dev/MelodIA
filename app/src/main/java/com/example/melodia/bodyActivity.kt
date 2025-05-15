@@ -21,6 +21,8 @@ import java.io.IOException
 import java.util.*
 import android.animation.ValueAnimator
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class bodyActivity : AppCompatActivity() {
 
@@ -121,33 +123,49 @@ class bodyActivity : AppCompatActivity() {
 
         val heartBtn = findViewById<ImageView>(R.id.heart)
         heartBtn.setOnClickListener {
-            val heartBtn = findViewById<ImageView>(R.id.heart)
-            heartBtn.setOnClickListener {
-                currentTrackUrl?.let { url ->
-                    val input = EditText(this)
-                    input.hint = "Nombre de la canción"
+            currentTrackUrl?.let { url ->
+                val input = EditText(this)
+                input.hint = "Nombre de la canción"
 
-                    AlertDialog.Builder(this)
-                        .setTitle("Guardar canción")
-                        .setView(input)
-                        .setPositiveButton("Guardar") { _, _ ->
-                            val name = input.text.toString().trim()
-                            if (name.isNotEmpty()) {
-                                val prefs = getSharedPreferences("saved_songs", MODE_PRIVATE)
-                                prefs.edit().putString(name, url).apply()
-                                Toast.makeText(this, "🎵 Canción guardada", Toast.LENGTH_SHORT).show()
+                AlertDialog.Builder(this)
+                    .setTitle("Guardar canción")
+                    .setView(input)
+                    .setPositiveButton("Guardar") { _, _ ->
+                        val name = input.text.toString().trim()
+                        if (name.isNotEmpty()) {
+                            val db = FirebaseFirestore.getInstance()
+                            val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+                            if (userId != null) {
+                                val songData = hashMapOf(
+                                    "title" to name,
+                                    "url" to url,
+                                    "timestamp" to System.currentTimeMillis()
+                                )
+                                db.collection("users")
+                                    .document(userId)
+                                    .collection("songs")
+                                    .add(songData)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(this, "🎵 Canción guardada en la nube", Toast.LENGTH_SHORT).show()
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(this, "❗ Error al guardar en Firebase", Toast.LENGTH_SHORT).show()
+                                    }
                             } else {
-                                Toast.makeText(this, "❗ El nombre no puede estar vacío", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "❗ Usuario no autenticado", Toast.LENGTH_SHORT).show()
                             }
+                        } else {
+                            Toast.makeText(this, "❗ El nombre no puede estar vacío", Toast.LENGTH_SHORT).show()
                         }
-                        .setNegativeButton("Cancelar", null)
-                        .show()
-                } ?: run {
-                    Toast.makeText(this, "⚠️ No hay canción para guardar", Toast.LENGTH_SHORT).show()
-                }
+                    }
+                    .setNegativeButton("Cancelar", null)
+                    .show()
+            } ?: run {
+                Toast.makeText(this, "⚠️ No hay canción para guardar", Toast.LENGTH_SHORT).show()
             }
-
         }
+
 
         val promptBtn = findViewById<ImageView>(R.id.prompt)
         val chatBox = findViewById<EditText>(R.id.chatbox)
@@ -304,7 +322,7 @@ class bodyActivity : AppCompatActivity() {
 
         val request = Request.Builder()
             .url("https://public-api.beatoven.ai/api/v1/tracks/compose")
-            .addHeader("Authorization", "Bearer ryi47h1881J20pqUP34ArQ")
+            .addHeader("Authorization", "Bearer x1SZHDPKx9LNxL5dNauXyQ")
             .addHeader("Content-Type", "application/json")
             .post(requestBody)
             .build()
