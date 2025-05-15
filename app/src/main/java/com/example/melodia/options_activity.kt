@@ -15,6 +15,7 @@ class Optionsactivity : AppCompatActivity() {
 
     private lateinit var prefs: SharedPreferences
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.options_activity)

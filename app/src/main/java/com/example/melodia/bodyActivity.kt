@@ -29,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class bodyActivity : AppCompatActivity() {
 
+
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var seekBar: SeekBar
     private lateinit var handler: Handler

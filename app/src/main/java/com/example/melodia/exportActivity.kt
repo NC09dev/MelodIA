@@ -35,6 +35,7 @@ class exportActivity : AppCompatActivity() {
 
         val container = findViewById<LinearLayout>(R.id.songsContainer)
 
+
         // Mapa de colores: fondo -> texto
         val colorPairs = mapOf(
             "#F49194" to "#FFDF8E",

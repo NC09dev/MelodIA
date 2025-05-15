@@ -8,6 +8,7 @@
     android:padding="30dp"
     android:background="#FFFFFF">
 
+
     <TextView
         android:id="@+id/songName"
         android:layout_width="0dp"

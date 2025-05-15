@@ -22,6 +22,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
         setContentView(R.layout.forgotpassword_activity)
         hideSystemUI()
 
+
         auth = FirebaseAuth.getInstance()
 
         emailEditText = findViewById(R.id.etForgotEmail)
