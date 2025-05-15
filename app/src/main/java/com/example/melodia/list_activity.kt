@@ -7,11 +7,15 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import android.graphics.Color
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import androidx.activity.enableEdgeToEdge
 
 class Listactivity : AppCompatActivity() {
 
     private lateinit var mediaPlayer: MediaPlayer
+    private lateinit var db: FirebaseFirestore
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,29 +24,68 @@ class Listactivity : AppCompatActivity() {
         enableEdgeToEdge()
 
         mediaPlayer = MediaPlayer()
+        db = FirebaseFirestore.getInstance()
+        auth = FirebaseAuth.getInstance()
 
         val container = findViewById<LinearLayout>(R.id.songsContainer)
-        val prefs = getSharedPreferences("saved_songs", MODE_PRIVATE)
-        val allSongs = prefs.all
-
         val colors = listOf("#F90370", "#F5D225", "#F49194")
 
-        for ((name, url) in allSongs) {
-            val item = layoutInflater.inflate(R.layout.item_song, container, false)
+        val userId = auth.currentUser?.uid
 
-            val nameText = item.findViewById<TextView>(R.id.songName)
-            val playBtn = item.findViewById<ImageView>(R.id.playButton)
-            val layout = item.findViewById<ConstraintLayout>(R.id.songLayout)
-
-            layout.setBackgroundColor(Color.parseColor(colors.random()))
-            nameText.text = name.toString()
-
-            playBtn.setOnClickListener {
-                reproducirDesdeUrl(url.toString())
-            }
-
-            container.addView(item)
+        if (userId == null) {
+            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
+            return
         }
+
+        db.collection("users")
+            .document(userId)
+            .collection("songs")
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    val songId = document.id
+                    val songName = document.getString("title") ?: "Sin título"
+                    val songUrl = document.getString("url") ?: ""
+
+                    val item = layoutInflater.inflate(R.layout.item_song, container, false)
+
+                    val nameText = item.findViewById<TextView>(R.id.songName)
+                    val playBtn = item.findViewById<ImageView>(R.id.playButton)
+                    val deleteBtn = item.findViewById<TextView>(R.id.deleteButton) // ✅ botón para eliminar
+                    val layout = item.findViewById<ConstraintLayout>(R.id.songLayout)
+
+                    layout.setBackgroundColor(Color.parseColor(colors.random()))
+                    nameText.text = songName
+
+                    playBtn.setOnClickListener {
+                        if (songUrl.isNotEmpty()) {
+                            reproducirDesdeUrl(songUrl)
+                        } else {
+                            Toast.makeText(this, "URL no válida para esta canción", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    deleteBtn.setOnClickListener {
+                        db.collection("users")
+                            .document(userId)
+                            .collection("songs")
+                            .document(songId)
+                            .delete()
+                            .addOnSuccessListener {
+                                Toast.makeText(this, "🎵 Canción eliminada", Toast.LENGTH_SHORT).show()
+                                container.removeView(item)
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(this, "❌ Error al eliminar: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+
+                    container.addView(item)
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al cargar canciones: ${e.message}", Toast.LENGTH_LONG).show()
+            }
     }
 
     private fun reproducirDesdeUrl(audioUrl: String) {
@@ -82,6 +125,5 @@ class Listactivity : AppCompatActivity() {
         super.onDestroy()
         if (::mediaPlayer.isInitialized) mediaPlayer.release()
     }
-
-
 }
+
